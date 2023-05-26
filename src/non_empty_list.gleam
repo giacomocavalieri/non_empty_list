@@ -60,76 +60,6 @@ pub fn append_list(first: NonEmptyList(a), second: List(a)) -> NonEmptyList(a) {
   new(first.first, list.append(first.rest, second))
 }
 
-/// Returns the element in the Nth position in the list, with 0 being the
-/// first position.
-///
-/// `Error(Nil)` is returned if the list is not long enough for the given index
-/// or if the index is less than 0.
-///
-/// ## Examples
-/// ```gleam
-/// > new("a", ["b", "c"])
-/// > |> at(index: 1)
-/// Ok("b")
-/// ```
-///
-/// ```gleam
-/// > new("a", ["b", "c"])
-/// > |> at(index: 5)
-/// Error(Nil)
-/// ```
-///
-pub fn at(in list: NonEmptyList(a), at index: Int) -> Result(a, Nil) {
-  case index {
-    _ if index < 0 -> Error(Nil)
-    0 -> Ok(list.first)
-    _ -> list.at(list.rest, index - 1)
-  }
-}
-
-/// Determines whether or not a given element exists within a given list.
-///
-/// This function traverses the list to find the element, so it runs in linear time.
-///
-/// ## Examples
-/// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> contains(any: 1)
-/// True
-/// ```
-///
-/// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> contains(any: 0)
-/// False
-/// ```
-///
-pub fn contains(list: NonEmptyList(a), any elem: a) -> Bool {
-  list.first == elem || list.contains(list.rest, elem)
-}
-
-/// Counts the number of elements in a given list.
-///
-/// This function has to traverse the list to determine the number of elements,
-/// so it runs in linear time.
-///
-/// ## Examples
-/// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> count
-/// 4
-/// ```
-///
-/// ```gleam
-/// > single("a")
-/// > |> count
-/// 1
-/// ```
-///
-pub fn count(list: NonEmptyList(a)) -> Int {
-  1 + list.length(list.rest)
-}
-
 /// Returns a list that is the given non-empty list with up to the given
 /// number of elements removed from the front of the list.
 ///
@@ -150,62 +80,6 @@ pub fn drop(from list: NonEmptyList(a), up_to n: Int) -> List(a) {
   list
   |> to_list
   |> list.drop(up_to: n)
-}
-
-/// Finds the first element in a given non-empty list for which the given function
-/// returns `True`.
-///
-/// Returns `Error(Nil)` if no such element is found.
-///
-/// ## Examples
-/// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> find(fn(x) { x > 2 })
-/// Ok(3)
-/// ```
-///
-/// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> find(fn(x) { x < 0 })
-/// Result(Nil)
-/// ```
-///
-pub fn find(
-  in haystack: NonEmptyList(a),
-  one_that is_desired: fn(a) -> Bool,
-) -> Result(a, Nil) {
-  case is_desired(haystack.first) {
-    True -> Ok(haystack.first)
-    False -> list.find(in: haystack.rest, one_that: is_desired)
-  }
-}
-
-/// Finds the first element in a given list for which the given function returns
-/// `Ok(new_value)`, then returns the wrapped `new_value`.
-///
-/// Returns `Error(Nil)` if no such element is found.
-///
-/// ## Examples
-/// ```gleam
-/// > new([], [[2, 3], [4]])
-/// > |> find_map(head)
-/// Ok(2)
-/// ```
-///
-/// ```gleam
-/// > new([], [[], []])
-/// > |> find_map(head)
-/// Error(Nil)
-/// ```
-///
-pub fn find_map(
-  in haystack: NonEmptyList(a),
-  with fun: fn(a) -> Result(b, c),
-) -> Result(b, Nil) {
-  case fun(haystack.first) {
-    Ok(result) -> Ok(result)
-    Error(_) -> list.find_map(in: haystack.rest, with: fun)
-  }
 }
 
 /// Gets the first element from the start of the non-empty list.
@@ -615,7 +489,7 @@ pub fn strict_zip(
   list: NonEmptyList(a),
   with other: NonEmptyList(b),
 ) -> Result(NonEmptyList(#(a, b)), list.LengthMismatch) {
-  case count(list) == count(other) {
+  case list.length(to_list(list)) == list.length(to_list(other)) {
     True -> Ok(zip(list, with: other))
     False -> Error(list.LengthMismatch)
   }

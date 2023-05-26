@@ -36,73 +36,6 @@ pub fn append_list_test() {
   |> should.equal(non_empty_list.single("a"))
 }
 
-pub fn at_test() {
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.at(0)
-  |> should.be_ok
-  |> should.equal(1)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.at(2)
-  |> should.be_ok
-  |> should.equal(3)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.at(-1)
-  |> should.be_error
-  |> should.equal(Nil)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.at(4)
-  |> should.be_error
-  |> should.equal(Nil)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.at(5)
-  |> should.be_error
-  |> should.equal(Nil)
-}
-
-pub fn contains_test() {
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.contains(any: 1)
-  |> should.equal(True)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.contains(any: 2)
-  |> should.equal(True)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.contains(any: 3)
-  |> should.equal(True)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.contains(any: 4)
-  |> should.equal(True)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.contains(any: 5)
-  |> should.equal(False)
-
-  non_empty_list.single(1)
-  |> non_empty_list.contains(any: 1)
-  |> should.equal(True)
-
-  non_empty_list.single(1)
-  |> non_empty_list.contains(any: 5)
-  |> should.equal(False)
-}
-
-pub fn count_test() {
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.count
-  |> should.equal(4)
-
-  non_empty_list.single("a")
-  |> non_empty_list.count
-  |> should.equal(1)
-}
-
 pub fn drop_test() {
   non_empty_list.new(1, [2, 3, 4])
   |> non_empty_list.drop(2)
@@ -127,30 +60,6 @@ pub fn drop_test() {
   non_empty_list.new(1, [2, 3, 4])
   |> non_empty_list.drop(5)
   |> should.equal([])
-}
-
-pub fn find_test() {
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.find(fn(x) { x > 2 })
-  |> should.be_ok
-  |> should.equal(3)
-
-  non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.find(fn(x) { x < 0 })
-  |> should.be_error
-  |> should.equal(Nil)
-}
-
-pub fn find_map_test() {
-  non_empty_list.new([], [[1, 2], [], [3]])
-  |> non_empty_list.find_map(list.first)
-  |> should.be_ok
-  |> should.equal(1)
-
-  non_empty_list.new([], [[], [], []])
-  |> non_empty_list.find_map(list.first)
-  |> should.be_error
-  |> should.equal(Nil)
 }
 
 pub fn flat_map_test() {
@@ -306,25 +215,26 @@ pub fn shuffle_test() {
   let shuffled =
     non_empty_list.new(1, [2, 3, 4])
     |> non_empty_list.shuffle
+    |> non_empty_list.to_list
 
   shuffled
-  |> non_empty_list.contains(1)
+  |> list.contains(1)
   |> should.equal(True)
 
   shuffled
-  |> non_empty_list.contains(2)
+  |> list.contains(1)
   |> should.equal(True)
 
   shuffled
-  |> non_empty_list.contains(3)
+  |> list.contains(3)
   |> should.equal(True)
 
   shuffled
-  |> non_empty_list.contains(4)
+  |> list.contains(4)
   |> should.equal(True)
 
   shuffled
-  |> non_empty_list.count
+  |> list.length
   |> should.equal(4)
 }
 

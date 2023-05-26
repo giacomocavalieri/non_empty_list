@@ -5,7 +5,7 @@
 
 Non-empty lists in Gleam ✨
 
-This package has almost exactly all functions you can find on [`gleam/list`](https://hexdocs.pm/gleam_stdlib/gleam/list.html) but for non-empty lists. If you think there's a missing functions you'd love to have, open an issue!
+This package exposes many functions to work on non-empty lists. If you think there's a missing functions you'd love to have, open an issue!
 
 ## Installation
 
