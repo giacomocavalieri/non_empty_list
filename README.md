@@ -1,7 +1,7 @@
 # non_empty_list
 
-[![Package Version](https://img.shields.io/hexpm/v/non_empty)](https://hex.pm/packages/non_empty)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/non_empty/)
+[![Package Version](https://img.shields.io/hexpm/v/non_empty_list)](https://hex.pm/packages/non_empty_list)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/non_empty_list/)
 
 Non-empty lists in Gleam ✨
 
