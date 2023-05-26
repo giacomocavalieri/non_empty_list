@@ -3,19 +3,13 @@
 [![Package Version](https://img.shields.io/hexpm/v/non_empty)](https://hex.pm/packages/non_empty)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/non_empty/)
 
-A Gleam project
+Non-empty lists in Gleam ✨
 
-## Quick start
-
-```sh
-gleam run   # Run the project
-gleam test  # Run the tests
-gleam shell # Run an Erlang shell
-```
+This package has almost exactly all functions you can find on `gleam/list` but for non-empty lists. If you think there's a missing functions you'd love to have, open an issue!
 
 ## Installation
 
-If available on Hex this package can be added to your Gleam project:
+This package can be added to your Gleam project:
 
 ```sh
 gleam add non_empty
