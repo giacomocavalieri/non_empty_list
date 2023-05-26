@@ -130,13 +130,6 @@ pub fn count(list: NonEmptyList(a)) -> Int {
   1 + list.length(list.rest)
 }
 
-/// An error that occurs when dropping an element from a non-empty list
-/// would make it empty.
-///
-pub type ListWasTooShort {
-  ListWasTooShort
-}
-
 /// Returns a list that is the given non-empty list with up to the given
 /// number of elements removed from the front of the list.
 ///
