@@ -2,20 +2,19 @@
 
 [![Package Version](https://img.shields.io/hexpm/v/non_empty_list)](https://hex.pm/packages/non_empty_list)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/non_empty_list/)
+![CI](https://github.com/giacomocavalieri/non_empty_list/workflows/CI/badge.svg?branch=main)
 
 Non-empty lists in Gleam ✨
 
-This package exposes many functions to work on non-empty lists. If you think there's a missing functions you'd love to have, open an issue!
+> ⚙️ This package supports both the Erlang and JavaScript target!
 
 ## Installation
 
-This package can be added to your Gleam project:
+To add this package to your Gleam project:
 
 ```sh
 gleam add non_empty_list
 ```
-
-and its documentation can be found at <https://hexdocs.pm/non_empty>.
 
 ## Usage
 
@@ -33,3 +32,9 @@ pub fn main() {
   |> io.println 
 }
 ```
+
+## Contributing
+
+This package exposes most of the same functions you'd find in the `gleam/list` module but it may be missing some useful functions.
+
+If you think there's a missing function that would fit here, or if you spot a bug don't be afraid to open PRs, issues or requests of any kind! Any contribution is welcome 💜
