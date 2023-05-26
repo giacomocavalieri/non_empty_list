@@ -1,10 +1,10 @@
 name = "non_empty_list"
 version = "0.1.0"
-description = "A Gleam project"
+description = "Non-empty lists in Gleam ✨"
 
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "giacomocavalieri", repo = "non_empty_list" }
-# links = [{ title = "Website", href = "https://gleam.run" }]
+links = [{ title = "Repository", href = "https://github.com/giacomocavalieri/non_empty_list" }]
 
 [dependencies]
 gleam_stdlib = "~> 0.29"
