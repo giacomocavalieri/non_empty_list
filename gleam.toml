@@ -1,6 +1,6 @@
 name = "non_empty_list"
-version = "0.1.0"
-description = "Non-empty lists in Gleam ✨"
+version = "1.0.0"
+description = "Non-empty lists in Gleam"
 
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "giacomocavalieri", repo = "non_empty_list" }
