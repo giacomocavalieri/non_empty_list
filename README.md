@@ -27,7 +27,7 @@ import gleam/io
 
 pub fn main() {
   non_empty_list.new(1, [2, 3, 4])
-  |> non_empty_list.scan(fn(n, m) { n + m })
+  |> non_empty_list.reduce(with: fn(n, m) { n + m })
   |> int.to_string
   |> io.println 
 }
