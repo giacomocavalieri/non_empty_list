@@ -1,8 +1,9 @@
+import gleam/int
+import gleam/list
+import gleam/pair
 import gleeunit
 import gleeunit/should
 import non_empty_list.{ListWasEmpty, NonEmptyList}
-import gleam/list
-import gleam/int
 
 pub fn main() {
   gleeunit.main()
@@ -133,6 +134,24 @@ pub fn map_test() {
   non_empty_list.new(1, [2, 3, 4])
   |> non_empty_list.map(fn(x) { x + 1 })
   |> should.equal(non_empty_list.new(2, [3, 4, 5]))
+}
+
+pub fn map2_test() {
+  non_empty_list.new(1, [2, 3])
+  |> non_empty_list.map2(non_empty_list.new(4, [5, 6]), int.add)
+  |> should.equal(non_empty_list.new(5, [7, 9]))
+
+  non_empty_list.new(1, [2, 3])
+  |> non_empty_list.map2(non_empty_list.new("a", ["b"]), pair.new)
+  |> should.equal(non_empty_list.new(#(1, "a"), [#(2, "b")]))
+
+  non_empty_list.new(1, [2])
+  |> non_empty_list.map2(non_empty_list.new("a", ["b", "c"]), pair.new)
+  |> should.equal(non_empty_list.new(#(1, "a"), [#(2, "b")]))
+
+  non_empty_list.single(1)
+  |> non_empty_list.map2(non_empty_list.new("a", ["b", "c"]), pair.new)
+  |> should.equal(non_empty_list.single(#(1, "a")))
 }
 
 pub fn map_fold_test() {

@@ -268,6 +268,45 @@ pub fn map(over list: NonEmptyList(a), with fun: fn(a) -> b) -> NonEmptyList(b) 
   new(fun(list.first), list.map(list.rest, with: fun))
 }
 
+/// Combines two non-empty lists into a single non-empty list using the given
+/// function.
+/// 
+/// If a list is longer than the other the extra elements are dropped.
+/// 
+/// ## Examples
+/// 
+/// ```gleam
+/// > map2(new(1, [2, 3]), new(4, [5, 6]), fn(x, y) { x + y }) |> to_list
+/// [5, 7, 9]
+/// ```
+/// 
+/// ```gleam
+/// > map2(new(1, [2]), new("a", ["b", "c"]), fn(i, x) { #(i, x) }) |> to_list
+/// [#(1, "a"), #(2, "b")]
+/// ```
+/// 
+pub fn map2(
+  list1: NonEmptyList(a),
+  list2: NonEmptyList(b),
+  with fun: fn(a, b) -> c,
+) -> NonEmptyList(c) {
+  do_map2(single(fun(list1.first, list2.first)), list1.rest, list2.rest, fun)
+}
+
+fn do_map2(
+  acc: NonEmptyList(c),
+  list1: List(a),
+  list2: List(b),
+  with fun: fn(a, b) -> c,
+) -> NonEmptyList(c) {
+  case list1, list2 {
+    [], _ | _, [] -> reverse(acc)
+    [first_a, ..rest_as], [first_b, ..rest_bs] ->
+      prepend(acc, fun(first_a, first_b))
+      |> do_map2(rest_as, rest_bs, fun)
+  }
+}
+
 /// Similar to `map` but also lets you pass around an accumulated value.
 ///
 /// ## Examples
