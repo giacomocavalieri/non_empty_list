@@ -1,11 +1,11 @@
-import glacier
-import glacier/should
+import gleeunit
+import gleeunit/should
 import non_empty_list.{ListWasEmpty, NonEmptyList}
 import gleam/list
 import gleam/int
 
 pub fn main() {
-  glacier.main()
+  gleeunit.main()
 }
 
 pub fn append_test() {
