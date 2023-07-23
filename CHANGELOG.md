@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.1.0 - 2023-07-23
 
 - the `non_empty_list` module gains the `map2` function
 
