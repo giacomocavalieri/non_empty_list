@@ -4,7 +4,7 @@
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/non_empty_list/)
 ![CI](https://github.com/giacomocavalieri/non_empty_list/workflows/CI/badge.svg?branch=main)
 
-Non-empty lists in Gleam ✨
+✨ Non-empty lists in Gleam
 
 > ⚙️ This package supports both the Erlang and JavaScript target!
 
