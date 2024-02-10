@@ -156,17 +156,13 @@ pub fn map2_test() {
 
 pub fn map_fold_test() {
   non_empty_list.new(1, [2, 3])
-  |> non_empty_list.map_fold(
-    from: 100,
-    with: fn(memo, i) { #(memo + i, i * 2) },
-  )
+  |> non_empty_list.map_fold(from: 100, with: fn(memo, i) { #(memo + i, i * 2) })
   |> should.equal(#(106, non_empty_list.new(2, [4, 6])))
 
   non_empty_list.new(1, [2, 3])
-  |> non_empty_list.map_fold(
-    from: 100,
-    with: fn(memo, i) { #(memo - i, i * memo) },
-  )
+  |> non_empty_list.map_fold(from: 100, with: fn(memo, i) {
+    #(memo - i, i * memo)
+  })
   |> should.equal(#(94, non_empty_list.new(100, [198, 291])))
 }
 

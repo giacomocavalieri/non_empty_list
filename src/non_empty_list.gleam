@@ -1,7 +1,7 @@
 import gleam/list
 import gleam/result
 import gleam/pair
-import gleam/order.{Order}
+import gleam/order.{type Order}
 
 /// A list that is guaranteed to contain at least one item.
 pub type NonEmptyList(a) {
@@ -103,7 +103,7 @@ pub fn first(list: NonEmptyList(a)) -> a {
 /// > |> flat_map(fn(x) { new(x, [x + 1]) })
 /// NonEmptyList(1, [2, 3, 4, 5, 6])
 /// ```
-/// 
+///
 pub fn flat_map(
   over list: NonEmptyList(a),
   with fun: fn(a) -> NonEmptyList(b),
@@ -254,7 +254,7 @@ pub fn last(list: NonEmptyList(a)) -> a {
   |> result.unwrap(list.first)
 }
 
-/// Returns a new non-empty list containing only the elements of the first 
+/// Returns a new non-empty list containing only the elements of the first
 /// non-empty list after the function has been applied to each one.
 ///
 /// ## Examples
@@ -270,21 +270,21 @@ pub fn map(over list: NonEmptyList(a), with fun: fn(a) -> b) -> NonEmptyList(b) 
 
 /// Combines two non-empty lists into a single non-empty list using the given
 /// function.
-/// 
+///
 /// If a list is longer than the other the extra elements are dropped.
-/// 
+///
 /// ## Examples
-/// 
+///
 /// ```gleam
 /// > map2(new(1, [2, 3]), new(4, [5, 6]), fn(x, y) { x + y }) |> to_list
 /// [5, 7, 9]
 /// ```
-/// 
+///
 /// ```gleam
 /// > map2(new(1, [2]), new("a", ["b", "c"]), fn(i, x) { #(i, x) }) |> to_list
 /// [#(1, "a"), #(2, "b")]
 /// ```
-/// 
+///
 pub fn map2(
   list1: NonEmptyList(a),
   list2: NonEmptyList(b),
@@ -322,15 +322,14 @@ pub fn map_fold(
   with fun: fn(b, a) -> #(b, c),
 ) -> #(b, NonEmptyList(c)) {
   let #(acc, first_elem) = fun(acc, list.first)
-  list.fold(
-    over: list.rest,
-    from: #(acc, single(first_elem)),
-    with: fn(acc_non_empty, item) {
-      let #(acc, non_empty) = acc_non_empty
-      let #(acc, new_item) = fun(acc, item)
-      #(acc, prepend(to: non_empty, this: new_item))
-    },
-  )
+  list.fold(over: list.rest, from: #(acc, single(first_elem)), with: fn(
+    acc_non_empty,
+    item,
+  ) {
+    let #(acc, non_empty) = acc_non_empty
+    let #(acc, new_item) = fun(acc, item)
+    #(acc, prepend(to: non_empty, this: new_item))
+  })
   |> pair.map_second(reverse)
 }
 
