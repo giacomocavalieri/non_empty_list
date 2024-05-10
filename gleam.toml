@@ -1,13 +1,14 @@
 name = "non_empty_list"
-version = "1.1.1"
+version = "1.1.2"
 description = "Non-empty lists in Gleam"
-
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "giacomocavalieri", repo = "non_empty_list" }
 links = []
+gleam = ">= 1.0.0 and < 2.0.0"
 
 [dependencies]
-gleam_stdlib = "~> 0.34 or ~> 1.0"
+gleam_stdlib = ">= 0.37.0 and < 2.0.0"
+
 
 [dev-dependencies]
-gleeunit = "~> 1.0"
+gleeunit = ">= 1.0.0 and < 2.0.0"

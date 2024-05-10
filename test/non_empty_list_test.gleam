@@ -272,12 +272,12 @@ pub fn string_zip_test() {
   non_empty_list.new(1, [2, 3])
   |> non_empty_list.strict_zip(with: non_empty_list.single("a"))
   |> should.be_error
-  |> should.equal(list.LengthMismatch)
+  |> should.equal(Nil)
 
   non_empty_list.single(1)
   |> non_empty_list.strict_zip(with: non_empty_list.new("a", ["b", "c"]))
   |> should.be_error
-  |> should.equal(list.LengthMismatch)
+  |> should.equal(Nil)
 
   non_empty_list.new(1, [2, 3])
   |> non_empty_list.strict_zip(with: non_empty_list.new("a", ["b", "c"]))
