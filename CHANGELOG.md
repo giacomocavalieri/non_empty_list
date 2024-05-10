@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.2 - 2024-02-10
+## Unreleased
 
 - replaces a reference to Error value `list.LengthMismatch` that does not
   exist in the `stdlib` library anymore with `Nil`.

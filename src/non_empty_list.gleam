@@ -1,7 +1,3 @@
-//// Non-empty lists in Gleam
-////
-//// lists that is guaranteed to contain at least one item.
-
 import gleam/list
 import gleam/order.{type Order}
 import gleam/pair
