@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## v2.0.0 - 2024-05-11
 
-- replaces a reference to Error value `list.LengthMismatch` that does not
-  exist in the `stdlib` library anymore with `Nil`.
+- the `from_list` function in the `non_empty_list` module now return
+  `Error(Nil)` if the passed list is empty.
+- the `strict_zip` function in the `non_empty_list` module now returns
+  `Nil` upon error instead of `list.LengthMismatch` which no longer exists in
+  `stdlib`.
 - update `stdlib` dep to `>= 0.37.0 and < 2.0.0`.
 - set gleam version requirement to `>= 1.0.0 and < 2.0.0`.
 

@@ -9,13 +9,6 @@ pub type NonEmptyList(a) {
   NonEmptyList(first: a, rest: List(a))
 }
 
-/// An error that occurs when trying to convert an empty list into a
-/// non empty list.
-///
-pub type ListWasEmpty {
-  ListWasEmpty
-}
-
 /// Joins a non-empty list onto the end of a non-empty list.
 ///
 /// This function runs in linear time, and it traverses and copies the first non-empty list.
@@ -174,12 +167,12 @@ fn reverse_and_prepend(
 ///
 /// ```gleam
 /// > from_list([])
-/// Error(ListWasEmpty)
+/// Error(Nil)
 /// ```
 ///
-pub fn from_list(list: List(a)) -> Result(NonEmptyList(a), ListWasEmpty) {
+pub fn from_list(list: List(a)) -> Result(NonEmptyList(a), Nil) {
   case list {
-    [] -> Error(ListWasEmpty)
+    [] -> Error(Nil)
     [first, ..rest] -> Ok(new(first, rest))
   }
 }
@@ -530,12 +523,12 @@ pub fn sort(
 ///
 /// ```gleam
 /// > strict_zip(single(1), new("a", ["b", "c"]))
-/// Error(LengthMismatch)
+/// Error(Nil)
 /// ```
 ///
 /// ```gleam
 /// > strict_zip(new(1, [2, 3]), single("a"))
-/// Error(LengthMismatch)
+/// Error(Nil)
 /// ```
 ///
 /// ```gleam

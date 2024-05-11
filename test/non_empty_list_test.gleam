@@ -3,7 +3,7 @@ import gleam/list
 import gleam/pair
 import gleeunit
 import gleeunit/should
-import non_empty_list.{ListWasEmpty, NonEmptyList}
+import non_empty_list.{NonEmptyList}
 
 pub fn main() {
   gleeunit.main()
@@ -101,7 +101,7 @@ pub fn from_list_test() {
   []
   |> non_empty_list.from_list
   |> should.be_error
-  |> should.equal(ListWasEmpty)
+  |> should.equal(Nil)
 }
 
 pub fn index_map_test() {
