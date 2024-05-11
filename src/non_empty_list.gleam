@@ -1,9 +1,10 @@
 import gleam/list
-import gleam/result
-import gleam/pair
 import gleam/order.{type Order}
+import gleam/pair
+import gleam/result
 
 /// A list that is guaranteed to contain at least one item.
+///
 pub type NonEmptyList(a) {
   NonEmptyList(first: a, rest: List(a))
 }
@@ -20,6 +21,7 @@ pub type ListWasEmpty {
 /// This function runs in linear time, and it traverses and copies the first non-empty list.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> append(new(5, [6, 7]))
@@ -44,6 +46,7 @@ pub fn append(
 /// This function runs in linear time, and it traverses and copies the first non-empty list.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> append_list([5, 6, 7])
@@ -64,6 +67,7 @@ pub fn append_list(first: NonEmptyList(a), second: List(a)) -> NonEmptyList(a) {
 /// number of elements removed from the front of the list.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new("a", ["b", "c"])
 /// > |> drop(up_to: 2)
@@ -85,6 +89,7 @@ pub fn drop(from list: NonEmptyList(a), up_to n: Int) -> List(a) {
 /// Gets the first element from the start of the non-empty list.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> first
@@ -98,6 +103,7 @@ pub fn first(list: NonEmptyList(a)) -> a {
 /// Maps the non-empty list with the given function and then flattens it.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [3, 5])
 /// > |> flat_map(fn(x) { new(x, [x + 1]) })
@@ -155,6 +161,7 @@ fn reverse_and_prepend(
 /// list is empty.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > from_list([1, 2, 3, 4])
 /// Ok(NonEmptyList(1, [2, 3, 4]))
@@ -183,6 +190,7 @@ pub fn from_list(list: List(a)) -> Result(NonEmptyList(a), ListWasEmpty) {
 /// The index starts at 0, so the first element is 0, the second is 1, and so on.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new("a", ["b", "c"])
 /// > |> index_map(fn(index, letter) { #(index, letter) })
@@ -214,6 +222,7 @@ fn do_index_map(
 /// This function runs in linear time and copies the list.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> intersperse(with: 0)
@@ -237,6 +246,7 @@ pub fn intersperse(list: NonEmptyList(a), with elem: a) -> NonEmptyList(a) {
 /// see `gleam/queue.Queue`.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > single(1)
 /// > |> last
@@ -258,6 +268,7 @@ pub fn last(list: NonEmptyList(a)) -> a {
 /// non-empty list after the function has been applied to each one.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3])
 /// > |> map(fn(x) { x + 1 })
@@ -310,6 +321,7 @@ fn do_map2(
 /// Similar to `map` but also lets you pass around an accumulated value.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3])
 /// > |> map_fold(from: 100, with: fn(memo, n) { #(memo + i, i * 2) })
@@ -322,14 +334,15 @@ pub fn map_fold(
   with fun: fn(b, a) -> #(b, c),
 ) -> #(b, NonEmptyList(c)) {
   let #(acc, first_elem) = fun(acc, list.first)
-  list.fold(over: list.rest, from: #(acc, single(first_elem)), with: fn(
-    acc_non_empty,
-    item,
-  ) {
-    let #(acc, non_empty) = acc_non_empty
-    let #(acc, new_item) = fun(acc, item)
-    #(acc, prepend(to: non_empty, this: new_item))
-  })
+  list.fold(
+    over: list.rest,
+    from: #(acc, single(first_elem)),
+    with: fn(acc_non_empty, item) {
+      let #(acc, non_empty) = acc_non_empty
+      let #(acc, new_item) = fun(acc, item)
+      #(acc, prepend(to: non_empty, this: new_item))
+    },
+  )
   |> pair.map_second(reverse)
 }
 
@@ -337,6 +350,7 @@ pub fn map_fold(
 /// for the rest of the elements.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// NonEmptyList(1, [2, 3, 4])
@@ -353,6 +367,7 @@ pub fn new(first: a, rest: List(a)) -> NonEmptyList(a) {
 /// Prefixes an item to a non-empty list.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(2, [3, 4])
 /// > |> prepend(1)
@@ -369,6 +384,7 @@ pub fn prepend(to list: NonEmptyList(a), this item: a) -> NonEmptyList(a) {
 /// The function is called as `fun(accumulator, current_element)`.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> reduce(fn(acc, x) { acc + x })
@@ -383,6 +399,7 @@ pub fn reduce(over list: NonEmptyList(a), with fun: fn(a, a) -> a) -> a {
 /// be empty this functions returns a normal list.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> rest
@@ -406,6 +423,7 @@ pub fn rest(list: NonEmptyList(a)) -> List(a) {
 /// non-empty list, so it runs in linear time.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> reverse
@@ -424,6 +442,7 @@ pub fn reverse(list: NonEmptyList(a)) -> NonEmptyList(a) {
 /// Similar to fold, but yields the state of the accumulator at each stage.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> scan(from: 100, with: fn(acc, i) { acc + i })
@@ -469,6 +488,7 @@ pub fn shuffle(list: NonEmptyList(a)) -> NonEmptyList(a) {
 /// Creates a non-empty list with a single element.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > single(1)
 /// NonEmptyList(1, [])
@@ -526,10 +546,10 @@ pub fn sort(
 pub fn strict_zip(
   list: NonEmptyList(a),
   with other: NonEmptyList(b),
-) -> Result(NonEmptyList(#(a, b)), list.LengthMismatch) {
+) -> Result(NonEmptyList(#(a, b)), Nil) {
   case list.length(to_list(list)) == list.length(to_list(other)) {
     True -> Ok(zip(list, with: other))
-    False -> Error(list.LengthMismatch)
+    False -> Error(Nil)
   }
 }
 
@@ -542,6 +562,7 @@ pub fn strict_zip(
 /// This function runs in linear time but does not copy the list.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > take(2)
@@ -564,6 +585,7 @@ pub fn take(from list: NonEmptyList(a), up_to n: Int) -> List(a) {
 /// elements.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [2, 3, 4])
 /// > |> to_list
@@ -585,6 +607,7 @@ pub fn to_list(non_empty: NonEmptyList(a)) -> List(a) {
 /// This function returns in loglinear time.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(1, [1, 2, 3, 1, 4, 4, 3])
 /// > |> unique
@@ -604,6 +627,7 @@ pub fn unique(list: NonEmptyList(a)) -> NonEmptyList(a) {
 /// non-empty lists.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > new(#(1, "a"), [#(2, "b"), #(3, "c")])
 /// > |> unzip
@@ -622,6 +646,7 @@ pub fn unzip(list: NonEmptyList(#(a, b))) -> #(NonEmptyList(a), NonEmptyList(b))
 /// the longer non-empty list are not used.
 ///
 /// ## Examples
+///
 /// ```gleam
 /// > zip(new(1, [2, 3]), single("a"))
 /// NonEmptyList(#(1, "a"), [])
