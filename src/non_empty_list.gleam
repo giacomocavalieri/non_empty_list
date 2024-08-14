@@ -234,7 +234,7 @@ pub fn group(
 /// ```gleam
 /// > new("a", ["b", "c"])
 /// > |> index_map(fn(index, letter) { #(index, letter) })
-/// NonEmpty(#(0, "a"), [#(1, "b"), #(2, "c")])
+/// NonEmptyList(#(0, "a"), [#(1, "b"), #(2, "c")])
 /// ```
 ///
 pub fn index_map(
@@ -312,7 +312,7 @@ pub fn last(list: NonEmptyList(a)) -> a {
 /// ```gleam
 /// > new(1, [2, 3])
 /// > |> map(fn(x) { x + 1 })
-/// NonEmpty(2, [3, 4])
+/// NonEmptyList(2, [3, 4])
 /// ```
 ///
 pub fn map(over list: NonEmptyList(a), with fun: fn(a) -> b) -> NonEmptyList(b) {
@@ -365,7 +365,7 @@ fn do_map2(
 /// ```gleam
 /// > new(1, [2, 3])
 /// > |> map_fold(from: 100, with: fn(memo, n) { #(memo + i, i * 2) })
-/// #(106, NonEmpty(2, [4, 6]))
+/// #(106, NonEmptyList(2, [4, 6]))
 /// ```
 ///
 pub fn map_fold(
