@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.0 - 2024-08-14
+
+- the `non_empty_list` module gains the `group` function.
+
 ## v2.0.0 - 2024-05-11
 
 - the `from_list` function in the `non_empty_list` module now return
@@ -12,12 +16,12 @@
 
 ## v1.1.1 - 2024-02-10
 
-- update `stdlib` dep to `~> 0.34 or ~> 1.0`
-- update `gleeunit` dep to `~> 1.0`
+- update `stdlib` dep to `~> 0.34 or ~> 1.0`.
+- update `gleeunit` dep to `~> 1.0`.
 
 ## v1.1.0 - 2023-07-23
 
-- the `non_empty_list` module gains the `map2` function
+- the `non_empty_list` module gains the `map2` function.
 
 ## v1.0.0 - 2023-05-26
 
