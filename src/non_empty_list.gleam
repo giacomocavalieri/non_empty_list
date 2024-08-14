@@ -1,3 +1,4 @@
+import gleam/dict.{type Dict}
 import gleam/list
 import gleam/order.{type Order}
 import gleam/pair
@@ -175,6 +176,52 @@ pub fn from_list(list: List(a)) -> Result(NonEmptyList(a), Nil) {
     [] -> Error(Nil)
     [first, ..rest] -> Ok(new(first, rest))
   }
+}
+
+/// Takes a list and groups the values by a key
+/// which is built from a key function.
+///
+/// Does not preserve the initial value order.
+///
+/// ## Examples
+///
+/// ```gleam
+/// import gleam/dict
+///
+/// new(Ok(3), [Error("Wrong"), Ok(200), Ok(73)])
+/// |> group(by: fn(i) {
+///   case i {
+///     Ok(_) -> "Successful"
+///     Error(_) -> "Failed"
+///   }
+/// })
+/// |> dict.to_list
+/// // -> [
+/// //   #("Failed", NonEmptyList(Error("Wrong"), [])),
+/// //   #("Successful", NonEmptyList(Ok(73), [Ok(200), Ok(3)])),
+/// // ]
+/// ```
+///
+/// ```gleam
+/// import gleam/dict
+/// 
+/// new(1, [2,3,4,5])
+/// |> group(by: fn(i) { i - i / 3 * 3 })
+/// |> dict.to_list
+/// // -> [#(0, NonEmptyList(3, [])), #(1, NonEmptyList(4, [1])), #(2, NonEmptyList(5, [2]))]
+/// ```
+///
+pub fn group(
+  list: NonEmptyList(v),
+  by key: fn(v) -> k,
+) -> Dict(k, NonEmptyList(v)) {
+  list
+  |> to_list
+  |> list.group(by: key)
+  |> dict.map_values(fn(_, group) {
+    let assert Ok(group) = from_list(group)
+    group
+  })
 }
 
 /// Returns a new list containing only the elements of the first list after the

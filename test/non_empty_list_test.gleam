@@ -1,3 +1,4 @@
+import gleam/dict
 import gleam/int
 import gleam/list
 import gleam/pair
@@ -102,6 +103,36 @@ pub fn from_list_test() {
   |> non_empty_list.from_list
   |> should.be_error
   |> should.equal(Nil)
+}
+
+pub fn group_test() {
+  non_empty_list.new(1, [])
+  |> non_empty_list.group(by: fn(x) { x * 4 })
+  |> should.equal(dict.from_list([#(4, non_empty_list.new(1, []))]))
+
+  non_empty_list.new(Ok(3), [Error("Wrong"), Ok(200), Ok(73)])
+  |> non_empty_list.group(by: fn(i) {
+    case i {
+      Ok(_) -> "Successful"
+      Error(_) -> "Failed"
+    }
+  })
+  |> should.equal(
+    dict.from_list([
+      #("Failed", NonEmptyList(Error("Wrong"), [])),
+      #("Successful", NonEmptyList(Ok(73), [Ok(200), Ok(3)])),
+    ]),
+  )
+
+  non_empty_list.new(1, [2, 3, 4, 5])
+  |> non_empty_list.group(by: fn(i) { i - i / 3 * 3 })
+  |> should.equal(
+    dict.from_list([
+      #(0, NonEmptyList(3, [])),
+      #(1, NonEmptyList(4, [1])),
+      #(2, NonEmptyList(5, [2])),
+    ]),
+  )
 }
 
 pub fn index_map_test() {
