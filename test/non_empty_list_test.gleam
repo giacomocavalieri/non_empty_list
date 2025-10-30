@@ -10,6 +10,17 @@ pub fn main() {
   gleeunit.main()
 }
 
+pub fn all_test() {
+  non_empty_list.new(1, [2, 3, 4])
+  |> non_empty_list.map(Ok)
+  |> non_empty_list.all
+  |> should.be_ok
+
+  non_empty_list.new(Ok(1), [Error("e")])
+  |> non_empty_list.all
+  |> should.be_error
+}
+
 pub fn append_test() {
   non_empty_list.new(1, [2, 3, 4])
   |> non_empty_list.append(non_empty_list.new(5, [6, 7]))
@@ -159,6 +170,16 @@ pub fn last_test() {
   non_empty_list.single(1)
   |> non_empty_list.last
   |> should.equal(1)
+}
+
+pub fn length_test() {
+  non_empty_list.new(1, [])
+  |> non_empty_list.length
+  |> should.equal(1)
+
+  non_empty_list.new(1, [2, 3, 4])
+  |> non_empty_list.length
+  |> should.equal(4)
 }
 
 pub fn map_test() {

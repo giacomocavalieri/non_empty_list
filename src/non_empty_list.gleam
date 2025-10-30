@@ -10,6 +10,42 @@ pub type NonEmptyList(a) {
   NonEmptyList(first: a, rest: List(a))
 }
 
+/// Combines a `NonEmptyList` of `Result`s into a single `Result`. If all
+///  elements in the list are `Ok` then returns an `Ok` holding the list of
+/// values. If any element is `Error` then returns the first error.
+///
+/// This function runs in linear time, and it traverses and copies the `Ok`
+/// values or the `Error` value.
+///
+/// ## Examples
+///
+/// ```gleam
+/// new(Ok(1), [Ok(2)])
+/// |> all
+/// // -> Ok(NonEmptyList(1, [2]))
+/// ```
+///
+/// ```gleam
+/// new(Ok(1), [Error("e")])
+/// |> all
+/// // -> Error("e")
+/// ```
+///
+pub fn all(results: NonEmptyList(Result(a, e))) -> Result(NonEmptyList(a), e) {
+  case first(results) {
+    Ok(value) -> all_loop(rest(results), value, [])
+    Error(error) -> Error(error)
+  }
+}
+
+fn all_loop(results: List(Result(a, e)), acc_first: a, acc_rest: List(a)) {
+  case results {
+    [Error(error), ..] -> Error(error)
+    [Ok(value), ..rest] -> all_loop(rest, value, [acc_first, ..acc_rest])
+    [] -> Ok(reverse(new(acc_first, acc_rest)))
+  }
+}
+
 /// Joins a non-empty list onto the end of a non-empty list.
 ///
 /// This function runs in linear time, and it traverses and copies the first non-empty list.
@@ -204,7 +240,7 @@ pub fn from_list(list: List(a)) -> Result(NonEmptyList(a), Nil) {
 ///
 /// ```gleam
 /// import gleam/dict
-/// 
+///
 /// new(1, [2,3,4,5])
 /// |> group(by: fn(i) { i - i / 3 * 3 })
 /// |> dict.to_list
@@ -302,6 +338,37 @@ pub fn intersperse(list: NonEmptyList(a), with elem: a) -> NonEmptyList(a) {
 pub fn last(list: NonEmptyList(a)) -> a {
   list.last(list.rest)
   |> result.unwrap(list.first)
+}
+
+/// Counts the number of elements in a given list.
+///
+/// This function has to traverse the list to determine the number of elements,
+///  so it runs in linear time.
+///
+/// ## Examples
+///
+/// ```gleam
+/// > single(0) |> length
+/// // -> 1
+/// ```
+///
+/// ```gleam
+/// > new(0,[1])
+/// > |> length
+/// // -> 2
+/// ```
+///
+/// ```gleam
+/// > new(0, [1, 2, 3, 4, 5])
+/// > |> length
+/// // -> 6
+/// ```
+///
+pub fn length(of list: NonEmptyList(a)) -> Int {
+  case list.rest {
+    [] -> 1
+    rest -> 1 + list.length(rest)
+  }
 }
 
 /// Returns a new non-empty list containing only the elements of the first
@@ -456,8 +523,8 @@ pub fn rest(list: NonEmptyList(a)) -> List(a) {
   list.rest
 }
 
-/// Creates a new non-empty list from a given non-empty list containing the same elements
-/// but in the opposite order.
+/// Creates a new non-empty list from a given non-empty list containing the same
+/// elements but in the opposite order.
 ///
 /// This function has to traverse the non-empty list to create the new reversed
 /// non-empty list, so it runs in linear time.
@@ -562,9 +629,11 @@ pub fn sort(
   sorted
 }
 
-/// Takes two non-empty lists and returns a single non-empty list of 2-element tuples.
+/// Takes two non-empty lists and returns a single non-empty list of 2-element
+/// tuples.
 ///
-/// If one of the non-empty lists is longer than the other, an `Error` is returned.
+/// If one of the non-empty lists is longer than the other, an `Error` is
+/// returned.
 ///
 /// ## Examples
 ///
@@ -680,10 +749,11 @@ pub fn unzip(list: NonEmptyList(#(a, b))) -> #(NonEmptyList(a), NonEmptyList(b))
   |> pair.map_second(new(list.first.1, _))
 }
 
-/// Takes two non-empty lists and returns a single non-empty list of 2-element tuples.
+/// Takes two non-empty lists and returns a single non-empty list of 2-element
+/// tuples.
 ///
-/// If one of the non-empty lists is longer than the other, the remaining elements from
-/// the longer non-empty list are not used.
+/// If one of the non-empty lists is longer than the other, the remaining
+/// elements from the longer non-empty list are not used.
 ///
 /// ## Examples
 ///

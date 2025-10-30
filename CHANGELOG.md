@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- the `non_empty_list` module gains the `length` and `all` functions.
+
 ## v2.0.0 - 2024-05-11
 
 - the `from_list` function in the `non_empty_list` module now return
