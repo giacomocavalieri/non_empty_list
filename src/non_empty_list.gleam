@@ -1,4 +1,5 @@
 import gleam/dict.{type Dict}
+import gleam/int
 import gleam/list
 import gleam/order.{type Order}
 import gleam/pair
@@ -8,6 +9,41 @@ import gleam/result
 ///
 pub type NonEmptyList(a) {
   NonEmptyList(first: a, rest: List(a))
+}
+
+/// Combines a `NonEmptyList` of `Result`s into a single `Result`. If all elements in the list are `Ok` then returns an `Ok` holding the list of values. If any element is `Error` then returns the first error.
+///
+/// This function runs in linear time, and it traverses and copies the `Ok` values or the `Error` value.
+///
+/// ## Examples
+///
+/// ```gleam
+/// new(Ok(1), [Ok(2)])
+/// |> all
+/// // -> Ok(NonEmptyList(1, [2]))
+/// ```
+///
+/// ```gleam
+/// new(NonEmptyList(Ok(1), [Error("e")])
+/// // -> Error("e")
+/// ```
+///
+pub fn all(results: NonEmptyList(Result(a, e))) -> Result(NonEmptyList(a), e) {
+  case first(results) {
+    Ok(value) -> do_all(rest(results), value, [])
+    Error(error) -> Error(error)
+  }
+}
+
+fn do_all(results: List(Result(a, e)), acc_first: a, acc_rest: List(a)) {
+  case results {
+    [Error(error), ..] -> Error(error)
+    [Ok(value), ..rest] -> do_all(rest, value, [acc_first, ..acc_rest])
+    [] ->
+      new(acc_first, acc_rest)
+      |> reverse
+      |> Ok
+  }
 }
 
 /// Joins a non-empty list onto the end of a non-empty list.
@@ -302,6 +338,36 @@ pub fn intersperse(list: NonEmptyList(a), with elem: a) -> NonEmptyList(a) {
 pub fn last(list: NonEmptyList(a)) -> a {
   list.last(list.rest)
   |> result.unwrap(list.first)
+}
+
+/// Counts the number of elements in a given list.
+/// 
+/// This function has to traverse the list to determine the number of elements, so it runs in linear time.
+///
+/// ## Examples
+///
+/// ```gleam
+/// > single(0)
+/// // -> 1
+/// ```
+///
+/// ```gleam
+/// > new(0,[1])
+/// > |> length
+/// // -> 2
+/// ```
+///
+/// ```gleam
+/// > new(0, [1, 2, 3, 4, 5])
+/// > |> length
+/// // -> 6
+/// ```
+///
+pub fn length(of list: NonEmptyList(a)) -> Int {
+  case list.first, list.rest {
+    _, [] -> 1
+    _, rest -> rest |> list.length |> int.add(1)
+  }
 }
 
 /// Returns a new non-empty list containing only the elements of the first
