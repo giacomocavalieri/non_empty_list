@@ -157,7 +157,7 @@ pub fn intersperse_test() {
     == non_empty_list.new("a", ["z", "b", "z", "c"])
 
   assert non_empty_list.intersperse(non_empty_list.single(1), 2)
-    == non_empty_list.new(1, [2])
+    == non_empty_list.single(1)
 }
 
 pub fn last_test() {

@@ -20,15 +20,8 @@ pub type NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// new(Ok(1), [Ok(2)])
-/// |> all
-/// // -> Ok(NonEmptyList(1, [2]))
-/// ```
-///
-/// ```gleam
-/// new(Ok(1), [Error("e")])
-/// |> all
-/// // -> Error("e")
+/// assert all(new(Ok(1), [Ok(2)])) == Ok(new(1, [2]))
+/// assert all(new(Ok(1), [Error("e")])) == Error("e")
 /// ```
 ///
 pub fn all(results: NonEmptyList(Result(a, e))) -> Result(NonEmptyList(a), e) {
@@ -48,20 +41,19 @@ fn all_loop(results: List(Result(a, e)), acc_first: a, acc_rest: List(a)) {
 
 /// Joins a non-empty list onto the end of a non-empty list.
 ///
-/// This function runs in linear time, and it traverses and copies the first non-empty list.
+/// This function runs in linear time, and it traverses and copies the first
+/// non-empty list.
 ///
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> append(new(5, [6, 7]))
-/// NonEmptyList(1, [2, 3, 4, 5, 6, 7])
-/// ```
+/// assert new(1, [2, 3, 4])
+///   |> append(new(5, [6, 7]))
+///   == new(1, [2, 3, 4, 5, 6, 7])
 ///
-/// ```gleam
-/// > single("a")
-/// > |> append(new("b", ["c"])
-/// NonEmptyList("a", ["b", "c"])
+/// assert single("a")
+///   |> append(new("b", ["c"])
+///   == new("a", ["b", "c"])
 /// ````
 ///
 pub fn append(
@@ -78,15 +70,13 @@ pub fn append(
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> append_list([5, 6, 7])
-/// NonEmptyList(1, [2, 3, 4, 5, 6, 7])
-/// ```
+/// assert new(1, [2, 3, 4])
+///   |> append_list([5, 6, 7])
+///   == new(1, [2, 3, 4, 5, 6, 7])
 ///
-/// ```gleam
-/// > new("a", ["b", "c"])
-/// > |> append_list([])
-/// NonEmptyList("a", ["b", "c"])
+/// assert new("a", ["b", "c"])
+///   |> append_list([])
+///   == new("a", ["b", "c"])
 /// ```
 ///
 pub fn append_list(first: NonEmptyList(a), second: List(a)) -> NonEmptyList(a) {
@@ -99,15 +89,8 @@ pub fn append_list(first: NonEmptyList(a), second: List(a)) -> NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new("a", ["b", "c"])
-/// > |> drop(up_to: 2)
-/// ["c"]
-/// ```
-///
-/// ```gleam
-/// > new("a", ["b", "c"])
-/// > |> drop(up_to: 3)
-/// []
+/// assert new("a", ["b", "c"]) |> drop(up_to: 2) == ["c"]
+/// assert new("a", ["b", "c"]) |> drop(up_to: 3) == []
 /// ```
 ///
 pub fn drop(from list: NonEmptyList(a), up_to n: Int) -> List(a) {
@@ -121,9 +104,7 @@ pub fn drop(from list: NonEmptyList(a), up_to n: Int) -> List(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> first
-/// 1
+/// assert first(new(1, [2, 3, 4])) == 1
 /// ```
 ///
 pub fn first(list: NonEmptyList(a)) -> a {
@@ -135,9 +116,9 @@ pub fn first(list: NonEmptyList(a)) -> a {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [3, 5])
-/// > |> flat_map(fn(x) { new(x, [x + 1]) })
-/// NonEmptyList(1, [2, 3, 4, 5, 6])
+/// assert new(1, [3, 5])
+///   |> flat_map(fn(x) { new(x, [x + 1]) })
+///   == new(1, [2, 3, 4, 5, 6])
 /// ```
 ///
 pub fn flat_map(
@@ -156,9 +137,9 @@ pub fn flat_map(
 /// ### Examples
 ///
 /// ```gleam
-/// > new(new(1, [2, 3]), [new(3, [4, 5])])
-/// > |> flatten
-/// NonEmptyList(1, [2, 3, 4, 5])
+/// assert new(new(1, [2, 3]), [new(3, [4, 5])])
+///   |> flatten
+///   == new(1, [2, 3, 4, 5])
 /// ```
 ///
 pub fn flatten(lists: NonEmptyList(NonEmptyList(a))) -> NonEmptyList(a) {
@@ -193,18 +174,9 @@ fn reverse_and_prepend(
 /// ## Examples
 ///
 /// ```gleam
-/// > from_list([1, 2, 3, 4])
-/// Ok(NonEmptyList(1, [2, 3, 4]))
-/// ```
-///
-/// ```gleam
-/// > from_list(["a"])
-/// Ok(NonEmptyList("a", []))
-/// ```
-///
-/// ```gleam
-/// > from_list([])
-/// Error(Nil)
+/// assert from_list([1, 2, 3, 4]) == Ok(new(1, [2, 3, 4]))
+/// assert from_list(["a"]) == Ok(single("a"))
+/// assert from_list([]) == Error(Nil)
 /// ```
 ///
 pub fn from_list(list: List(a)) -> Result(NonEmptyList(a), Nil) {
@@ -224,27 +196,13 @@ pub fn from_list(list: List(a)) -> Result(NonEmptyList(a), Nil) {
 /// ```gleam
 /// import gleam/dict
 ///
-/// new(Ok(3), [Error("Wrong"), Ok(200), Ok(73)])
-/// |> group(by: fn(i) {
-///   case i {
-///     Ok(_) -> "Successful"
-///     Error(_) -> "Failed"
-///   }
-/// })
-/// |> dict.to_list
-/// // -> [
-/// //   #("Failed", NonEmptyList(Error("Wrong"), [])),
-/// //   #("Successful", NonEmptyList(Ok(73), [Ok(200), Ok(3)])),
-/// // ]
-/// ```
-///
-/// ```gleam
-/// import gleam/dict
-///
-/// new(1, [2,3,4,5])
-/// |> group(by: fn(i) { i - i / 3 * 3 })
-/// |> dict.to_list
-/// // -> [#(0, NonEmptyList(3, [])), #(1, NonEmptyList(4, [1])), #(2, NonEmptyList(5, [2]))]
+/// assert new(1, [2, 3, 4, 5])
+///   |> group(by: fn(i) { i - i / 3 * 3 })
+///   == dict.from_list([
+///     #(0, new(3, [])),
+///     #(1, new(4, [1])),
+///     #(2, new(5, [2]))
+///   ]
 /// ```
 ///
 pub fn group(
@@ -268,9 +226,9 @@ pub fn group(
 /// ## Examples
 ///
 /// ```gleam
-/// > new("a", ["b", "c"])
-/// > |> index_map(fn(index, letter) { #(index, letter) })
-/// NonEmptyList(#(0, "a"), [#(1, "b"), #(2, "c")])
+/// assert new("a", ["b", "c"])
+///   |> index_map(fn(index, letter) { #(index, letter) })
+///   == new(#(0, "a"), [#(1, "b"), #(2, "c")])
 /// ```
 ///
 pub fn index_map(
@@ -300,19 +258,16 @@ fn do_index_map(
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> intersperse(with: 0)
-/// NonEmptyList(1, [0, 2, 0, 3, 0, 4])
-/// ```
-///
-/// ```gleam
-/// > single("a")
-/// > |> intersperse(with: "z")
-/// NonEmptyList("a", ["z"])
+/// assert new(1, [2, 3]) |> intersperse(with: 0) == new(1, [0, 2, 0, 3])
+/// assert single("a") |> intersperse(with: "z") == single("a")
 /// ```
 ///
 pub fn intersperse(list: NonEmptyList(a), with elem: a) -> NonEmptyList(a) {
-  new(list.first, [elem, ..list.intersperse(list.rest, with: elem)])
+  case list {
+    NonEmptyList(first: _, rest: []) -> list
+    NonEmptyList(first:, rest: [_, ..] as rest) ->
+      new(first, [elem, ..list.intersperse(rest, with: elem)])
+  }
 }
 
 /// Returns the last element in the given list.
@@ -324,15 +279,8 @@ pub fn intersperse(list: NonEmptyList(a), with elem: a) -> NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > single(1)
-/// > |> last
-/// 1
-/// ```
-///
-/// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> last
-/// 4
+/// assert last(single(1)) == 1
+/// assert last(new(1, [2, 3, 4])) == 4
 /// ```
 ///
 pub fn last(list: NonEmptyList(a)) -> a {
@@ -348,20 +296,8 @@ pub fn last(list: NonEmptyList(a)) -> a {
 /// ## Examples
 ///
 /// ```gleam
-/// > single(0) |> length
-/// // -> 1
-/// ```
-///
-/// ```gleam
-/// > new(0,[1])
-/// > |> length
-/// // -> 2
-/// ```
-///
-/// ```gleam
-/// > new(0, [1, 2, 3, 4, 5])
-/// > |> length
-/// // -> 6
+/// assert length(single(0)) == 1
+/// assert length(new(0, [1])) == 2
 /// ```
 ///
 pub fn length(of list: NonEmptyList(a)) -> Int {
@@ -377,9 +313,7 @@ pub fn length(of list: NonEmptyList(a)) -> Int {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3])
-/// > |> map(fn(x) { x + 1 })
-/// NonEmptyList(2, [3, 4])
+/// assert new(1, [2, 3]) |> map(fn(x) { x + 1 }) == new(2, [3, 4])
 /// ```
 ///
 pub fn map(over list: NonEmptyList(a), with fun: fn(a) -> b) -> NonEmptyList(b) {
@@ -394,13 +328,10 @@ pub fn map(over list: NonEmptyList(a), with fun: fn(a) -> b) -> NonEmptyList(b) 
 /// ## Examples
 ///
 /// ```gleam
-/// > map2(new(1, [2, 3]), new(4, [5, 6]), fn(x, y) { x + y }) |> to_list
-/// [5, 7, 9]
-/// ```
-///
-/// ```gleam
-/// > map2(new(1, [2]), new("a", ["b", "c"]), fn(i, x) { #(i, x) }) |> to_list
-/// [#(1, "a"), #(2, "b")]
+/// assert map2(new(1, [2, 3]), new(4, [5, 6]), fn(x, y) { x + y })
+///   == new(5, [7, 9])
+/// assert map2(new(1, [2]), new("a", ["b", "c"]), fn(i, x) { #(i, x) })
+///   == new(#(1, "a"), [#(2, "b")])
 /// ```
 ///
 pub fn map2(
@@ -430,9 +361,9 @@ fn do_map2(
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3])
-/// > |> map_fold(from: 100, with: fn(memo, n) { #(memo + i, i * 2) })
-/// #(106, NonEmptyList(2, [4, 6]))
+/// assert new(1, [2, 3])
+///   |> map_fold(from: 100, with: fn(memo, n) { #(memo + i, i * 2) })
+///   == #(106, new(2, [4, 6]))
 /// ```
 ///
 pub fn map_fold(
@@ -456,17 +387,6 @@ pub fn map_fold(
 /// Creates a new non-empty list given its first element and a list
 /// for the rest of the elements.
 ///
-/// ## Examples
-///
-/// ```gleam
-/// > new(1, [2, 3, 4])
-/// NonEmptyList(1, [2, 3, 4])
-/// ```
-/// ```gleam
-/// > new("a", [])
-/// NonEmptyList("a", [])
-/// ```
-///
 pub fn new(first: a, rest: List(a)) -> NonEmptyList(a) {
   NonEmptyList(first, rest)
 }
@@ -476,9 +396,7 @@ pub fn new(first: a, rest: List(a)) -> NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(2, [3, 4])
-/// > |> prepend(1)
-/// NonEmptyList(1, [2, 3, 4])
+/// assert new(2, [3, 4]) |> prepend(1) == new(1, [2, 3, 4])
 /// ```
 ///
 pub fn prepend(to list: NonEmptyList(a), this item: a) -> NonEmptyList(a) {
@@ -493,9 +411,7 @@ pub fn prepend(to list: NonEmptyList(a), this item: a) -> NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> reduce(fn(acc, x) { acc + x })
-/// 10
+/// assert new(1, [2, 3, 4]) |> reduce(fn(acc, x) { acc + x }) == 10
 /// ```
 ///
 pub fn reduce(over list: NonEmptyList(a), with fun: fn(a, a) -> a) -> a {
@@ -508,15 +424,8 @@ pub fn reduce(over list: NonEmptyList(a), with fun: fn(a, a) -> a) -> a {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> rest
-/// [2, 3, 4]
-/// ```
-///
-/// ```gleam
-/// > single(1)
-/// > |> rest
-/// []
+/// assert new(1, [2, 3, 4]) |> rest == [2, 3, 4]
+/// assert single(1) |> rest == []
 /// ```
 ///
 pub fn rest(list: NonEmptyList(a)) -> List(a) {
@@ -532,9 +441,7 @@ pub fn rest(list: NonEmptyList(a)) -> List(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> reverse
-/// NonEmptyList(4, [3, 2, 1])
+/// assert new(1, [2, 3, 4]) |> reverse == new(4, [3, 2, 1])
 /// ```
 ///
 pub fn reverse(list: NonEmptyList(a)) -> NonEmptyList(a) {
@@ -551,9 +458,9 @@ pub fn reverse(list: NonEmptyList(a)) -> NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> scan(from: 100, with: fn(acc, i) { acc + i })
-/// NonEmptyList(101 [103, 106, 110])
+/// assert new(1, [2, 3, 4])
+///   |> scan(from: 100, with: fn(acc, i) { acc + i })
+///   == new(101 [103, 106, 110])
 /// ```
 ///
 pub fn scan(
@@ -578,9 +485,7 @@ pub fn scan(
 /// ## Examples
 ///
 /// ```gleam
-/// > new("a", ["b", "c", "d"])
-/// > |> shuffle
-/// NonEmptyList("c", ["a", "d", "b"])
+/// assert new("a", ["b", "c", "d"]) |> shuffle == new("c", ["a", "d", "b"])
 /// ```
 ///
 pub fn shuffle(list: NonEmptyList(a)) -> NonEmptyList(a) {
@@ -597,8 +502,7 @@ pub fn shuffle(list: NonEmptyList(a)) -> NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > single(1)
-/// NonEmptyList(1, [])
+/// assert single(1) == new(1, [])
 /// ```
 ///
 pub fn single(first: a) -> NonEmptyList(a) {
@@ -611,10 +515,9 @@ pub fn single(first: a) -> NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > import gleam/int
-/// > new(4, [1, 3, 4, 2, 6, 5])
-/// > sort(by: int.compare)
-/// NonEmptyList(1, [2, 3, 4, 4, 5, 6])
+/// import gleam/int
+/// assert new(4, [1, 3, 4, 2, 6, 5]) |> sort(by: int.compare)
+///   == new(1, [2, 3, 4, 4, 5, 6])
 /// ```
 ///
 pub fn sort(
@@ -638,18 +541,10 @@ pub fn sort(
 /// ## Examples
 ///
 /// ```gleam
-/// > strict_zip(single(1), new("a", ["b", "c"]))
-/// Error(Nil)
-/// ```
-///
-/// ```gleam
-/// > strict_zip(new(1, [2, 3]), single("a"))
-/// Error(Nil)
-/// ```
-///
-/// ```gleam
-/// > strict_zip(new(1, [2, 3]), new("a", ["b", "c"]))
-/// Ok(NonEmptyList(#(1, "a"), [#(2, "b"), #(3, "c")]))
+/// assert strict_zip(single(1), new("a", ["b", "c"])) == Error(Nil)
+/// assert strict_zip(new(1, [2, 3]), single("a")) == Error(Nil)
+/// assert strict_zip(new(1, [2, 3]), new("a", ["b", "c"]))
+///   == Ok(new(#(1, "a"), [#(2, "b"), #(3, "c")]))
 /// ```
 ///
 pub fn strict_zip(
@@ -673,15 +568,8 @@ pub fn strict_zip(
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > take(2)
-/// [1, 2]
-/// ```
-///
-/// ```gleam
-/// > new(1, [2, 3, 4])
-/// > take(9)
-/// [1, 2, 3, 4]
+/// assert new(1, [2, 3, 4]) |> take(2) == [1, 2]
+/// assert new(1, [2, 3, 4]) |> take(9) == [1, 2, 3, 4]
 /// ```
 ///
 pub fn take(from list: NonEmptyList(a), up_to n: Int) -> List(a) {
@@ -696,15 +584,8 @@ pub fn take(from list: NonEmptyList(a), up_to n: Int) -> List(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [2, 3, 4])
-/// > |> to_list
-/// [1, 2, 3, 4]
-/// ```
-///
-/// ```gleam
-/// > single("a")
-/// > |> to_list
-/// ["a"]
+/// assert new(1, [2, 3, 4]) |> to_list == [1, 2, 3, 4]
+/// assert single("a") |> to_list == ["a"]
 /// ```
 ///
 pub fn to_list(non_empty: NonEmptyList(a)) -> List(a) {
@@ -718,9 +599,7 @@ pub fn to_list(non_empty: NonEmptyList(a)) -> List(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(1, [1, 2, 3, 1, 4, 4, 3])
-/// > |> unique
-/// NonEmptyList(1, [2, 3, 4])
+/// assert new(1, [1, 2, 3, 1, 4, 4, 3]) |> unique == new(1, [2, 3, 4])
 /// ```
 ///
 pub fn unique(list: NonEmptyList(a)) -> NonEmptyList(a) {
@@ -738,9 +617,8 @@ pub fn unique(list: NonEmptyList(a)) -> NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// > new(#(1, "a"), [#(2, "b"), #(3, "c")])
-/// > |> unzip
-/// #(NonEmptyList(1, [2, 3]), NonEmptyList("a", ["b", "c"]))
+/// assert new(#(1, "a"), [#(2, "b"), #(3, "c")]) |> unzip
+///  == #(new(1, [2, 3]), new("a", ["b", "c"]))
 /// ```
 ///
 pub fn unzip(list: NonEmptyList(#(a, b))) -> #(NonEmptyList(a), NonEmptyList(b)) {
@@ -758,18 +636,10 @@ pub fn unzip(list: NonEmptyList(#(a, b))) -> #(NonEmptyList(a), NonEmptyList(b))
 /// ## Examples
 ///
 /// ```gleam
-/// > zip(new(1, [2, 3]), single("a"))
-/// NonEmptyList(#(1, "a"), [])
-/// ```
-///
-/// ```gleam
-/// > zip(single(1), new("a", ["b", "c"]))
-/// NonEmptyList(#(1, "a"), [])
-/// ```
-///
-/// ```gleam
-/// > zip(new(1, [2, 3]), new("a", ["b", "c"]))
-/// NonEmptyList(#(1, "a"), [#(2, "b"), #(3, "c")])
+/// assert zip(new(1, [2, 3]), single("a")) == new(#(1, "a"), [])
+/// assert zip(single(1), new("a", ["b", "c"])) == new(#(1, "a"), [])
+/// assert zip(new(1, [2, 3]), new("a", ["b", "c"])) ==
+///   new(#(1, "a"), [#(2, "b"), #(3, "c")])
 /// ```
 ///
 pub fn zip(
