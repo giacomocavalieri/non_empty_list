@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+## v2.2.0 - 2025-11-17
 
 - the `non_empty_list` module gains the `length` and `all` functions.
+
+## v2.1.0 - 2024-08-14
+
+- the `non_empty_list` module gains the `group` function.
 
 ## v2.0.0 - 2024-05-11
 
