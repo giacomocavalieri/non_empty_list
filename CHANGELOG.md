@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- the `non_empty_list` module gains the `any`, `find`, and `fold` functions.
+
 ## v2.2.0 - 2025-11-17
 
 - the `non_empty_list` module gains the `length` and `all` functions.

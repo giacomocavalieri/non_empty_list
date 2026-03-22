@@ -83,6 +83,28 @@ pub fn append_list(first: NonEmptyList(a), second: List(a)) -> NonEmptyList(a) {
   new(first.first, list.append(first.rest, second))
 }
 
+/// Returns `True` if the given function returns `True` for any of the
+/// elements in the given non-empty list. If the function returns `True` for
+/// any of the elements it immediately returns `True` without checking the
+/// rest of the list.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert any(new(1, [2, 3]), satisfying: fn(x) { x > 2 })
+/// ```
+///
+/// ```gleam
+/// assert !any(new(1, [2, 3]), satisfying: fn(x) { x > 5 })
+/// ```
+///
+pub fn any(
+  in list: NonEmptyList(a),
+  satisfying predicate: fn(a) -> Bool,
+) -> Bool {
+  predicate(list.first) || list.any(list.rest, satisfying: predicate)
+}
+
 /// Returns a list that is the given non-empty list with up to the given
 /// number of elements removed from the front of the list.
 ///
@@ -130,6 +152,31 @@ pub fn flat_map(
   |> flatten
 }
 
+/// Finds the first element in a given non-empty list for which the given
+/// function returns `True`.
+///
+/// Returns `Error(Nil)` if no such element is found.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert new(1, [2, 3]) |> find(one_that: fn(x) { x > 1 }) == Ok(2)
+/// ```
+///
+/// ```gleam
+/// assert new(1, [2, 3]) |> find(one_that: fn(x) { x > 5 }) == Error(Nil)
+/// ```
+///
+pub fn find(
+  in list: NonEmptyList(a),
+  one_that is_desired: fn(a) -> Bool,
+) -> Result(a, Nil) {
+  case is_desired(list.first) {
+    True -> Ok(list.first)
+    False -> list.find(list.rest, one_that: is_desired)
+  }
+}
+
 /// Flattens a non-empty list of non-empty lists into a single non-empty list.
 ///
 /// This function traverses all elements twice.
@@ -166,6 +213,34 @@ fn reverse_and_prepend(
     [first, ..rest] ->
       reverse_and_prepend(new(first, rest), new(prefix.first, to_list(suffix)))
   }
+}
+
+/// Reduces a non-empty list of elements into a single value by calling a
+/// given function on each element, going from left to right.
+///
+/// `fold(new(1, [2, 3]), 0, add)` is the equivalent of
+/// `add(add(add(0, 1), 2), 3)`.
+///
+/// This function runs in linear time.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert new(1, [2, 3, 4])
+///   |> fold(from: 0, with: fn(acc, x) { acc + x })
+///   == 10
+/// ```
+///
+/// ```gleam
+/// assert single(5) |> fold(from: 0, with: fn(acc, x) { acc + x }) == 5
+/// ```
+///
+pub fn fold(
+  over list: NonEmptyList(a),
+  from initial: b,
+  with fun: fn(b, a) -> b,
+) -> b {
+  list.fold(over: list.rest, from: fun(initial, list.first), with: fun)
 }
 
 /// Attempts to turn a list into a non-empty list, fails if the starting

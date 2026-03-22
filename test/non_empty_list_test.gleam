@@ -51,6 +51,22 @@ pub fn append_list_test() {
     == non_empty_list.single("a")
 }
 
+pub fn any_test() {
+  assert non_empty_list.any(
+    in: non_empty_list.new(1, [2, 3]),
+    satisfying: fn(x) { x > 2 },
+  )
+
+  assert !non_empty_list.any(
+    in: non_empty_list.new(1, [2, 3]),
+    satisfying: fn(x) { x > 5 },
+  )
+
+  assert non_empty_list.any(in: non_empty_list.single(1), satisfying: fn(x) {
+    x == 1
+  })
+}
+
 pub fn drop_test() {
   assert [3, 4]
     == non_empty_list.new(1, [2, 3, 4])
@@ -75,6 +91,30 @@ pub fn drop_test() {
   assert []
     == non_empty_list.new(1, [2, 3, 4])
     |> non_empty_list.drop(5)
+}
+
+pub fn find_test() {
+  assert non_empty_list.new(1, [2, 3])
+    |> non_empty_list.find(one_that: fn(x) { x > 1 })
+    == Ok(2)
+
+  assert non_empty_list.new(1, [2, 3])
+    |> non_empty_list.find(one_that: fn(x) { x > 5 })
+    == Error(Nil)
+
+  assert non_empty_list.single(1)
+    |> non_empty_list.find(one_that: fn(x) { x == 1 })
+    == Ok(1)
+}
+
+pub fn fold_test() {
+  assert non_empty_list.new(1, [2, 3, 4])
+    |> non_empty_list.fold(from: 0, with: fn(acc, x) { acc + x })
+    == 10
+
+  assert non_empty_list.single(5)
+    |> non_empty_list.fold(from: 0, with: fn(acc, x) { acc + x })
+    == 5
 }
 
 pub fn flat_map_test() {
