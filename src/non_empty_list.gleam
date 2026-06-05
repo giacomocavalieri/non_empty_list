@@ -105,6 +105,34 @@ pub fn any(
   predicate(list.first) || list.any(list.rest, satisfying: predicate)
 }
 
+/// Counts the number of elements in a given list satisfying a given predicate.
+///
+/// This function has to traverse the list to determine the number of elements,
+/// so it runs in linear time.
+///
+/// ## Examples
+///
+/// ```gleam
+/// count(single(1), fn(a) { a > 0 })
+/// // -> 1
+/// ```
+///
+/// ```gleam
+/// count(new(1, [2, 3]), int.is_odd)
+/// // -> 2
+/// ```
+///
+/// ```gleam
+/// count(new(1, [3, 5, 7, 9]), int.is_even)
+/// // -> 0
+/// ```
+///
+pub fn count(list: NonEmptyList(a), where predicate: fn(a) -> Bool) -> Int {
+  list
+  |> to_list
+  |> list.count(predicate)
+}
+
 /// Returns a list that is the given non-empty list with up to the given
 /// number of elements removed from the front of the list.
 ///

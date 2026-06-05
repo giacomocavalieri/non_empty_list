@@ -67,6 +67,20 @@ pub fn any_test() {
   })
 }
 
+pub fn count_test() {
+  assert 1
+    == non_empty_list.single(1)
+    |> non_empty_list.count(where: fn(x) { x > 0 })
+
+  assert 2
+    == non_empty_list.new(1, [2, 3])
+    |> non_empty_list.count(where: int.is_odd)
+
+  assert 0
+    == non_empty_list.new(1, [3, 5, 7, 9])
+    |> non_empty_list.count(where: int.is_even)
+}
+
 pub fn drop_test() {
   assert [3, 4]
     == non_empty_list.new(1, [2, 3, 4])
