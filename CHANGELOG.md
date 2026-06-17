@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- rename the `all` function in the `non_empty_list` module to `all_ok` to avoid
+  confusion with `list.all` from `stdlib`.
 - the `index_map` function in the `non_empty_list` module now passes the index
   as the second argument to the map function, to match the `list.index_map`
   function in `stdlib`.
