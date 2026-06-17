@@ -20,11 +20,13 @@ pub type NonEmptyList(a) {
 /// ## Examples
 ///
 /// ```gleam
-/// assert all(new(Ok(1), [Ok(2)])) == Ok(new(1, [2]))
-/// assert all(new(Ok(1), [Error("e")])) == Error("e")
+/// assert all_ok(new(Ok(1), [Ok(2)])) == Ok(new(1, [2]))
+/// assert all_ok(new(Ok(1), [Error("e")])) == Error("e")
 /// ```
 ///
-pub fn all(results: NonEmptyList(Result(a, e))) -> Result(NonEmptyList(a), e) {
+pub fn all_ok(
+  results: NonEmptyList(Result(a, e)),
+) -> Result(NonEmptyList(a), e) {
   case first(results) {
     Ok(value) -> all_loop(rest(results), value, [])
     Error(error) -> Error(error)

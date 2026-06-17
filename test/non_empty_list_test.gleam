@@ -9,15 +9,15 @@ pub fn main() {
   gleeunit.main()
 }
 
-pub fn all_test() {
+pub fn all_ok_test() {
   let assert Ok(_) =
     non_empty_list.new(1, [2, 3, 4])
     |> non_empty_list.map(Ok)
-    |> non_empty_list.all
+    |> non_empty_list.all_ok
 
   let assert Error(_) =
     non_empty_list.new(Ok(1), [Error("e")])
-    |> non_empty_list.all
+    |> non_empty_list.all_ok
 }
 
 pub fn append_test() {
