@@ -10,6 +10,34 @@ pub type NonEmptyList(a) {
   NonEmptyList(first: a, rest: List(a))
 }
 
+/// Returns `True` if the given function returns `True` for all the elements in
+/// the given list. If the function returns `False` for any of the elements it
+/// immediately returns `False` without checking the rest of the list.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert all([], fn(x) { x > 3 })
+/// ```
+///
+/// ```gleam
+/// assert all([4, 5], fn(x) { x > 3 })
+/// ```
+///
+/// ```gleam
+/// assert !all([4, 3], fn(x) { x > 3 })
+/// ```
+///
+pub fn all(
+  in list: NonEmptyList(a),
+  satisfying predicate: fn(a) -> Bool,
+) -> Bool {
+  case predicate(list.first) {
+    True -> list.all(list.rest, predicate)
+    False -> False
+  }
+}
+
 /// Combines a `NonEmptyList` of `Result`s into a single `Result`. If all
 ///  elements in the list are `Ok` then returns an `Ok` holding the list of
 /// values. If any element is `Error` then returns the first error.

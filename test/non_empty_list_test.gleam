@@ -20,6 +20,22 @@ pub fn all_test() {
     |> non_empty_list.all
 }
 
+pub fn all_test() {
+  assert !non_empty_list.all(
+    in: non_empty_list.new(1, [2, 3]),
+    satisfying: fn(x) { x > 2 },
+  )
+
+  assert non_empty_list.all(
+    in: non_empty_list.new(1, [2, 3]),
+    satisfying: fn(x) { x < 5 },
+  )
+
+  assert non_empty_list.all(in: non_empty_list.single(1), satisfying: fn(x) {
+    x == 1
+  })
+}
+
 pub fn append_test() {
   assert non_empty_list.new(1, [2, 3, 4, 5, 6, 7])
     == non_empty_list.append(
