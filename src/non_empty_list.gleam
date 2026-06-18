@@ -889,6 +889,36 @@ pub fn to_list(non_empty: NonEmptyList(a)) -> List(a) {
   [non_empty.first, ..non_empty.rest]
 }
 
+/// A variant of fold that might fail.
+///
+/// The folding function should return `Result(accumulator, error)`.
+/// If the returned value is `Ok(accumulator)` try_fold will try the next value in the list.
+/// If the returned value is `Error(error)` try_fold will stop and return that error.
+///
+/// ## Examples
+///
+/// ```gleam
+/// NonEmptyList(1, [2, 3, 4])
+/// |> try_fold(0, fn(acc, i) {
+///   case i < 3 {
+///     True -> Ok(acc + i)
+///     False -> Error(Nil)
+///   }
+/// })
+/// // -> Error(Nil)
+/// ```
+///
+pub fn try_fold(
+  over list: NonEmptyList(a),
+  from initial: b,
+  with fun: fn(b, a) -> Result(b, err),
+) -> Result(b, err) {
+  case fun(initial, list.first) {
+    Error(reason) -> Error(reason)
+    Ok(acc) -> list.try_fold(list.rest, acc, fun)
+  }
+}
+
 /// Takes a function that returns a `Result` and applies it to each element in a
 /// given list in turn.
 ///

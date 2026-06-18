@@ -480,6 +480,26 @@ pub fn take_test() {
     == [1, 2, 3, 4]
 }
 
+pub fn try_fold_test() {
+  assert Error(Nil)
+    == non_empty_list.new(1, [2, 3, 4])
+    |> non_empty_list.try_fold(0, fn(acc, i) {
+      case int.is_odd(i) {
+        True -> Ok(acc + i)
+        False -> Error(Nil)
+      }
+    })
+
+  assert Ok(16)
+    == non_empty_list.new(1, [3, 5, 7])
+    |> non_empty_list.try_fold(0, fn(acc, i) {
+      case int.is_odd(i) {
+        True -> Ok(acc + i)
+        False -> Error(Nil)
+      }
+    })
+}
+
 pub fn to_list_test() {
   assert non_empty_list.to_list(non_empty_list.new(1, [2, 3, 4]))
     == [1, 2, 3, 4]
