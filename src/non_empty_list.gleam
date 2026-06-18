@@ -264,6 +264,32 @@ pub fn filter(
   }
 }
 
+/// Returns a new list containing only the elements from the first list for
+/// which the given functions returns `Ok(_)`.
+///
+/// ## Examples
+///
+/// ```gleam
+/// filter_map(NonEmptyList(2, [4, 6, 1]), Error)
+/// // -> []
+/// ```
+///
+/// ```gleam
+/// filter_map(NonEmptyList(2, [4, 6, 1]), fn(x) { Ok(x + 1) })
+/// // -> [3, 5, 7, 2]
+/// ```
+///
+pub fn filter_map(
+  list: NonEmptyList(a),
+  with fun: fn(a) -> Result(b, Nil),
+) -> List(b) {
+  let filtered = list.filter_map(list.rest, fun)
+  case fun(list.first) {
+    Error(_) -> filtered
+    Ok(mapped) -> [mapped, ..filtered]
+  }
+}
+
 /// Finds the first element in a given non-empty list for which the given
 /// function returns `True`.
 ///

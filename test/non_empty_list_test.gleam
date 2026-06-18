@@ -180,6 +180,17 @@ pub fn filter_test() {
     |> non_empty_list.filter(int.is_odd)
 }
 
+pub fn filter_map_test() {
+  assert [2, 4, 6]
+    == non_empty_list.new(1, [2, 3, 4, 5])
+    |> non_empty_list.filter_map(fn(x) {
+      case int.is_odd(x) {
+        True -> Ok(x + 1)
+        False -> Error(Nil)
+      }
+    })
+}
+
 pub fn flatten_test() {
   assert non_empty_list.single(1)
     |> non_empty_list.new([
