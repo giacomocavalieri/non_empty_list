@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- the `index_map` function in the `non_empty_list` module now passes the index
+  as the second argument to the map function, to match the `list.index_map`
+  function in `stdlib`.
+
 ## v2.3.0 - 2026-03-23
 
 - the `non_empty_list` module gains the `any`, `find`, and `fold` functions.
