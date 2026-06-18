@@ -238,6 +238,32 @@ pub fn flat_map(
   |> flatten
 }
 
+/// Returns a new list containing only the elements from the first list for
+/// which the given functions returns `True`.
+///
+/// ## Examples
+///
+/// ```gleam
+/// filter(NonEmptyList(2, [4, 6, 1]), fn(x) { x > 2 })
+/// // -> [4, 6]
+/// ```
+///
+/// ```gleam
+/// filter(NonEmptyList(2, [4, 6, 1]), fn(x) { x > 6 })
+/// // -> []
+/// ```
+///
+pub fn filter(
+  list: NonEmptyList(a),
+  keeping predicate: fn(a) -> Bool,
+) -> List(a) {
+  let filtered = list.filter(list.rest, predicate)
+  case predicate(list.first) {
+    False -> filtered
+    True -> [list.first, ..filtered]
+  }
+}
+
 /// Finds the first element in a given non-empty list for which the given
 /// function returns `True`.
 ///

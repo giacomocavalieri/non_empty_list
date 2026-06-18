@@ -174,6 +174,12 @@ pub fn flat_map_test() {
     |> non_empty_list.flat_map(fn(x) { non_empty_list.single(x) })
 }
 
+pub fn filter_test() {
+  assert [1, 3, 5]
+    == non_empty_list.new(1, [2, 3, 4, 5])
+    |> non_empty_list.filter(int.is_odd)
+}
+
 pub fn flatten_test() {
   assert non_empty_list.single(1)
     |> non_empty_list.new([
