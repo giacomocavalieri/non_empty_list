@@ -330,27 +330,29 @@ pub fn group(
 ///
 /// ```gleam
 /// assert new("a", ["b", "c"])
-///   |> index_map(fn(index, letter) { #(index, letter) })
+///   |> index_map(fn(letter, index) { #(index, letter) })
 ///   == new(#(0, "a"), [#(1, "b"), #(2, "c")])
 /// ```
 ///
 pub fn index_map(
   list: NonEmptyList(a),
-  with fun: fn(Int, a) -> b,
+  with fun: fn(a, Int) -> b,
 ) -> NonEmptyList(b) {
-  new(fun(0, list.first), do_index_map(list.rest, [], 1, fun))
+  new(fun(list.first, 0), do_index_map(list.rest, [], 1, fun))
 }
 
 fn do_index_map(
   list: List(a),
   accumulator: List(b),
   index: Int,
-  fun: fn(Int, a) -> b,
+  fun: fn(a, Int) -> b,
 ) -> List(b) {
   case list {
     [] -> list.reverse(accumulator)
-    [first, ..rest] ->
-      do_index_map(rest, [fun(index, first), ..accumulator], index + 1, fun)
+    [first, ..rest] -> {
+      let accumulator = [fun(first, index), ..accumulator]
+      do_index_map(rest, accumulator, index + 1, fun)
+    }
   }
 }
 

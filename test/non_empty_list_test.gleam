@@ -198,7 +198,7 @@ pub fn group_test() {
 pub fn index_map_test() {
   assert non_empty_list.index_map(
       non_empty_list.new("a", ["b", "c"]),
-      fn(index, letter) { #(index, letter) },
+      fn(letter, index) { #(index, letter) },
     )
     == non_empty_list.new(#(0, "a"), [#(1, "b"), #(2, "c")])
 }
