@@ -5,6 +5,9 @@
 - the `index_map` function in the `non_empty_list` module now passes the index
   as the second argument to the map function, to match the `list.index_map`
   function in `stdlib`.
+- the `non_empty_list` module gains the `all`, `contains`, `filter`,
+  `filter_map`, `fold_until`, `index_fold`, `split`, `try_fold` and `try_map`
+  functions.
 
 ## v2.3.0 - 2026-03-23
 
