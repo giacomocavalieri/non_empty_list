@@ -829,6 +829,39 @@ pub fn sort(
   sorted
 }
 
+/// Splits a list in two before the given index.
+///
+/// If the list is not long enough to have the given index the before list will
+/// be the input list, and the after list will be empty.
+///
+/// ## Examples
+///
+/// ```gleam
+/// split(NonEmptyList(6, [7, 8, 9]), 0)
+/// // -> #([], [6, 7, 8, 9])
+/// ```
+///
+/// ```gleam
+/// split(NonEmptyList(6, [ 7, 8, 9]), 2)
+/// // -> #([6, 7], [8, 9])
+/// ```
+///
+/// ```gleam
+/// split(NonEmptyList(6, [7, 8, 9]), 4)
+/// // -> #([6, 7, 8, 9], [])
+/// ```
+///
+pub fn split(list list: NonEmptyList(a), at index: Int) -> #(List(a), List(a)) {
+  case index {
+    0 -> #([], to_list(list))
+    1 -> #([list.first], list.rest)
+    _ -> {
+      let split = list.split(list.rest, index - 1)
+      #([list.first, ..split.0], split.1)
+    }
+  }
+}
+
 /// Takes two non-empty lists and returns a single non-empty list of 2-element
 /// tuples.
 ///

@@ -450,6 +450,17 @@ pub fn sort_test() {
     == non_empty_list.new(1, [2, 3, 4, 4, 5, 6])
 }
 
+pub fn split_test() {
+  assert #([], [6, 7, 8, 9])
+    == non_empty_list.split(NonEmptyList(6, [7, 8, 9]), 0)
+
+  assert #([6, 7], [8, 9])
+    == non_empty_list.split(NonEmptyList(6, [7, 8, 9]), 2)
+
+  assert #([6, 7, 8, 9], [])
+    == non_empty_list.split(NonEmptyList(6, [7, 8, 9]), 4)
+}
+
 pub fn string_zip_test() {
   let assert Error(value) =
     non_empty_list.strict_zip(
