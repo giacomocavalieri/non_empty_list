@@ -889,6 +889,42 @@ pub fn to_list(non_empty: NonEmptyList(a)) -> List(a) {
   [non_empty.first, ..non_empty.rest]
 }
 
+/// Takes a function that returns a `Result` and applies it to each element in a
+/// given list in turn.
+///
+/// If the function returns `Ok(new_value)` for all elements in the list then a
+/// list of the new values is returned.
+///
+/// If the function returns `Error(reason)` for any of the elements then it is
+/// returned immediately. None of the elements in the list are processed after
+/// one returns an `Error`.
+///
+/// ## Examples
+///
+/// ```gleam
+/// try_map(new(1, [2, 3]), fn(x) { Ok(x + 2) })
+/// // -> Ok([3, 4, 5])
+/// ```
+///
+/// ```gleam
+/// try_map(new(1, [2, 3]), fn(_) { Error(0) })
+/// // -> Error(0)
+/// ```
+///
+pub fn try_map(
+  over list: NonEmptyList(a),
+  with fun: fn(a) -> Result(b, c),
+) -> Result(NonEmptyList(b), c) {
+  case fun(list.first) {
+    Error(reason) -> Error(reason)
+    Ok(new_first) ->
+      case list.try_map(list.rest, fun) {
+        Error(reason) -> Error(reason)
+        Ok(new_rest) -> Ok(NonEmptyList(new_first, new_rest))
+      }
+  }
+}
+
 /// Removes any duplicate elements from a given list.
 ///
 /// This function returns in loglinear time.

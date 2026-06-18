@@ -301,6 +301,18 @@ pub fn map_test() {
     == non_empty_list.new(2, [3, 4, 5])
 }
 
+pub fn try_map_test() {
+  assert non_empty_list.try_map(non_empty_list.new(1, [2, 3, 4]), fn(x) {
+      Ok(x + 1)
+    })
+    == Ok(non_empty_list.new(2, [3, 4, 5]))
+
+  assert non_empty_list.try_map(non_empty_list.new(1, [2, 3, 4]), fn(x) {
+      Error(x)
+    })
+    == Error(1)
+}
+
 pub fn map2_test() {
   assert non_empty_list.map2(
       non_empty_list.new(1, [2, 3]),
