@@ -133,6 +133,36 @@ pub fn any(
   predicate(list.first) || list.any(list.rest, satisfying: predicate)
 }
 
+/// Determines whether or not a given element exists within a given list.
+///
+/// This function traverses the list to find the element, so it runs in linear
+/// time.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert NonEmptyList(0, []) |> contains(any: 0)
+/// ```
+///
+/// ```gleam
+/// assert !contains(NonEmptyList(1, []), any: 0)
+/// ```
+///
+/// ```gleam
+/// assert !contains(NonEmptyList(1, [1]), any: 0)
+/// ```
+///
+/// ```gleam
+/// assert NonEmptyList(1, [0]) |> contains(any: 0)
+/// ```
+///
+pub fn contains(list: NonEmptyList(a), any elem: a) -> Bool {
+  case list.first == elem {
+    False -> list.contains(list.rest, elem)
+    True -> True
+  }
+}
+
 /// Counts the number of elements in a given list satisfying a given predicate.
 ///
 /// This function has to traverse the list to determine the number of elements,

@@ -83,6 +83,15 @@ pub fn any_test() {
   })
 }
 
+pub fn contains_test() {
+  assert non_empty_list.new(1, [3, 5, 7, 9])
+    |> non_empty_list.contains(1)
+
+  assert False
+    == non_empty_list.new(1, [3, 5, 7, 9])
+    |> non_empty_list.contains(2)
+}
+
 pub fn count_test() {
   assert 1
     == non_empty_list.single(1)
