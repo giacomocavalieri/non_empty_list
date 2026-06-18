@@ -156,6 +156,14 @@ pub fn fold_test() {
     == 5
 }
 
+pub fn index_fold_test() {
+  assert non_empty_list.new(1, [3, 5, 7])
+    |> non_empty_list.index_fold(from: 0, with: fn(acc, _x, index) {
+      acc + index
+    })
+    == 6
+}
+
 pub fn flat_map_test() {
   assert non_empty_list.new(1, [2, 3, 4, 5, 6])
     == non_empty_list.new(1, [3, 5])

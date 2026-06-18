@@ -379,6 +379,47 @@ pub fn group(
   })
 }
 
+/// Like fold but the folding function also receives the index of the current element.
+///
+/// ## Examples
+///
+/// ```gleam
+/// NonEmptyList("a", ["b", "c"])
+/// |> index_fold("", fn(acc, item, index) {
+///    acc <> int.to_string(index) <> ":" <> item <> " "
+/// })
+/// // -> "0:a 1:b 2:c"
+/// ```
+///
+/// ```gleam
+/// NonEmptyList(10, [20, 30])
+/// |> index_fold(0, fn(acc, item, index) { acc + item * index })
+/// // -> 80
+/// ```
+///
+pub fn index_fold(
+  over list: NonEmptyList(a),
+  from initial: acc,
+  with fun: fn(acc, a, Int) -> acc,
+) -> acc {
+  initial
+  |> fun(list.first, 0)
+  |> index_fold_loop(list.rest, _, fun, 1)
+}
+
+fn index_fold_loop(
+  over: List(a),
+  acc: acc,
+  with: fn(acc, a, Int) -> acc,
+  index: Int,
+) -> acc {
+  case over {
+    [] -> acc
+    [first, ..rest] ->
+      index_fold_loop(rest, with(acc, first, index), with, index + 1)
+  }
+}
+
 /// Returns a new list containing only the elements of the first list after the
 /// function has been applied to each one and their index.
 ///
