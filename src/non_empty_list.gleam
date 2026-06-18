@@ -381,6 +381,47 @@ pub fn fold(
   list.fold(over: list.rest, from: fun(initial, list.first), with: fun)
 }
 
+/// A variant of fold that allows to stop folding earlier.
+///
+/// The folding function should return `ContinueOrStop(accumulator)`.
+/// If the returned value is `Continue(accumulator)` fold_until will try the next value in the list.
+/// If the returned value is `Stop(accumulator)` fold_until will stop and return that accumulator.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert NonEmptyList(1, [2, 3, 4])
+///   |> fold_until(0, fn(acc, i) {
+///     case i < 3 {
+///       True -> Continue(acc + i)
+///       False -> Stop(acc)
+///     }
+///   })
+///   == 3
+/// ```
+///
+pub fn fold_until(
+  over list: NonEmptyList(a),
+  from acc: acc,
+  with fun: fn(acc, a) -> ContinueOrStop(acc),
+) {
+  case fun(acc, list.first) {
+    Continue(acc) ->
+      list.fold_until(list.rest, acc, fn(acc, x) {
+        case fun(acc, x) {
+          Continue(a) -> list.Continue(a)
+          Stop(a) -> list.Stop(a)
+        }
+      })
+    Stop(acc) -> acc
+  }
+}
+
+pub type ContinueOrStop(a) {
+  Continue(a)
+  Stop(a)
+}
+
 /// Attempts to turn a list into a non-empty list, fails if the starting
 /// list is empty.
 ///

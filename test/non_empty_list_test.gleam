@@ -156,6 +156,26 @@ pub fn fold_test() {
     == 5
 }
 
+pub fn fold_until_test() {
+  assert non_empty_list.new(1, [2, 3, 4])
+    |> non_empty_list.fold_until(from: 0, with: fn(acc, x) {
+      case x == 3 {
+        True -> non_empty_list.Stop(acc)
+        False -> non_empty_list.Continue(acc + x)
+      }
+    })
+    == 3
+
+  assert non_empty_list.single(5)
+    |> non_empty_list.fold_until(from: 0, with: fn(acc, x) {
+      case x == 3 {
+        True -> non_empty_list.Stop(acc)
+        False -> non_empty_list.Continue(acc + x)
+      }
+    })
+    == 5
+}
+
 pub fn index_fold_test() {
   assert non_empty_list.new(1, [3, 5, 7])
     |> non_empty_list.index_fold(from: 0, with: fn(acc, _x, index) {
