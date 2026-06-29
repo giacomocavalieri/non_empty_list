@@ -423,7 +423,10 @@ pub fn length(of list: NonEmptyList(a)) -> Int {
 /// assert new(1, [2, 3]) |> map(fn(x) { x + 1 }) == new(2, [3, 4])
 /// ```
 ///
-pub fn map(over list: NonEmptyList(a), with fun: fn(a) -> b) -> NonEmptyList(b) {
+pub fn map(
+  over list: NonEmptyList(a),
+  with fun: fn(a) -> b,
+) -> NonEmptyList(b) {
   new(fun(list.first), list.map(list.rest, with: fun))
 }
 
@@ -728,7 +731,9 @@ pub fn unique(list: NonEmptyList(a)) -> NonEmptyList(a) {
 ///  == #(new(1, [2, 3]), new("a", ["b", "c"]))
 /// ```
 ///
-pub fn unzip(list: NonEmptyList(#(a, b))) -> #(NonEmptyList(a), NonEmptyList(b)) {
+pub fn unzip(
+  list: NonEmptyList(#(a, b)),
+) -> #(NonEmptyList(a), NonEmptyList(b)) {
   list.unzip(list.rest)
   |> pair.map_first(new(list.first.0, _))
   |> pair.map_second(new(list.first.1, _))
