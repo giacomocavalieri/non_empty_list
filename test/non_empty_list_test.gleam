@@ -20,6 +20,22 @@ pub fn all_ok_test() {
     |> non_empty_list.all_ok
 }
 
+pub fn all_test() {
+  assert !non_empty_list.all(
+    in: non_empty_list.new(1, [2, 3]),
+    satisfying: fn(x) { x > 2 },
+  )
+
+  assert non_empty_list.all(
+    in: non_empty_list.new(1, [2, 3]),
+    satisfying: fn(x) { x < 5 },
+  )
+
+  assert non_empty_list.all(in: non_empty_list.single(1), satisfying: fn(x) {
+    x == 1
+  })
+}
+
 pub fn append_test() {
   assert non_empty_list.new(1, [2, 3, 4, 5, 6, 7])
     == non_empty_list.append(
@@ -65,6 +81,15 @@ pub fn any_test() {
   assert non_empty_list.any(in: non_empty_list.single(1), satisfying: fn(x) {
     x == 1
   })
+}
+
+pub fn contains_test() {
+  assert non_empty_list.new(1, [3, 5, 7, 9])
+    |> non_empty_list.contains(1)
+
+  assert False
+    == non_empty_list.new(1, [3, 5, 7, 9])
+    |> non_empty_list.contains(2)
 }
 
 pub fn count_test() {
@@ -131,6 +156,34 @@ pub fn fold_test() {
     == 5
 }
 
+pub fn fold_until_test() {
+  assert non_empty_list.new(1, [2, 3, 4])
+    |> non_empty_list.fold_until(from: 0, with: fn(acc, x) {
+      case x == 3 {
+        True -> non_empty_list.Stop(acc)
+        False -> non_empty_list.Continue(acc + x)
+      }
+    })
+    == 3
+
+  assert non_empty_list.single(5)
+    |> non_empty_list.fold_until(from: 0, with: fn(acc, x) {
+      case x == 3 {
+        True -> non_empty_list.Stop(acc)
+        False -> non_empty_list.Continue(acc + x)
+      }
+    })
+    == 5
+}
+
+pub fn index_fold_test() {
+  assert non_empty_list.new(1, [3, 5, 7])
+    |> non_empty_list.index_fold(from: 0, with: fn(acc, _x, index) {
+      acc + index
+    })
+    == 6
+}
+
 pub fn flat_map_test() {
   assert non_empty_list.new(1, [2, 3, 4, 5, 6])
     == non_empty_list.new(1, [3, 5])
@@ -139,6 +192,23 @@ pub fn flat_map_test() {
   assert non_empty_list.new(1, [3, 5])
     == non_empty_list.new(1, [3, 5])
     |> non_empty_list.flat_map(fn(x) { non_empty_list.single(x) })
+}
+
+pub fn filter_test() {
+  assert [1, 3, 5]
+    == non_empty_list.new(1, [2, 3, 4, 5])
+    |> non_empty_list.filter(int.is_odd)
+}
+
+pub fn filter_map_test() {
+  assert [2, 4, 6]
+    == non_empty_list.new(1, [2, 3, 4, 5])
+    |> non_empty_list.filter_map(fn(x) {
+      case int.is_odd(x) {
+        True -> Ok(x + 1)
+        False -> Error(Nil)
+      }
+    })
 }
 
 pub fn flatten_test() {
@@ -229,6 +299,18 @@ pub fn length_test() {
 pub fn map_test() {
   assert non_empty_list.map(non_empty_list.new(1, [2, 3, 4]), fn(x) { x + 1 })
     == non_empty_list.new(2, [3, 4, 5])
+}
+
+pub fn try_map_test() {
+  assert non_empty_list.try_map(non_empty_list.new(1, [2, 3, 4]), fn(x) {
+      Ok(x + 1)
+    })
+    == Ok(non_empty_list.new(2, [3, 4, 5]))
+
+  assert non_empty_list.try_map(non_empty_list.new(1, [2, 3, 4]), fn(x) {
+      Error(x)
+    })
+    == Error(1)
 }
 
 pub fn map2_test() {
@@ -368,6 +450,17 @@ pub fn sort_test() {
     == non_empty_list.new(1, [2, 3, 4, 4, 5, 6])
 }
 
+pub fn split_test() {
+  assert #([], [6, 7, 8, 9])
+    == non_empty_list.split(NonEmptyList(6, [7, 8, 9]), 0)
+
+  assert #([6, 7], [8, 9])
+    == non_empty_list.split(NonEmptyList(6, [7, 8, 9]), 2)
+
+  assert #([6, 7, 8, 9], [])
+    == non_empty_list.split(NonEmptyList(6, [7, 8, 9]), 4)
+}
+
 pub fn string_zip_test() {
   let assert Error(value) =
     non_empty_list.strict_zip(
@@ -396,6 +489,26 @@ pub fn take_test() {
 
   assert non_empty_list.take(non_empty_list.new(1, [2, 3, 4]), 9)
     == [1, 2, 3, 4]
+}
+
+pub fn try_fold_test() {
+  assert Error(Nil)
+    == non_empty_list.new(1, [2, 3, 4])
+    |> non_empty_list.try_fold(0, fn(acc, i) {
+      case int.is_odd(i) {
+        True -> Ok(acc + i)
+        False -> Error(Nil)
+      }
+    })
+
+  assert Ok(16)
+    == non_empty_list.new(1, [3, 5, 7])
+    |> non_empty_list.try_fold(0, fn(acc, i) {
+      case int.is_odd(i) {
+        True -> Ok(acc + i)
+        False -> Error(Nil)
+      }
+    })
 }
 
 pub fn to_list_test() {

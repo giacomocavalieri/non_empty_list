@@ -10,6 +10,34 @@ pub type NonEmptyList(a) {
   NonEmptyList(first: a, rest: List(a))
 }
 
+/// Returns `True` if the given function returns `True` for all the elements in
+/// the given list. If the function returns `False` for any of the elements it
+/// immediately returns `False` without checking the rest of the list.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert all([], fn(x) { x > 3 })
+/// ```
+///
+/// ```gleam
+/// assert all([4, 5], fn(x) { x > 3 })
+/// ```
+///
+/// ```gleam
+/// assert !all([4, 3], fn(x) { x > 3 })
+/// ```
+///
+pub fn all(
+  in list: NonEmptyList(a),
+  satisfying predicate: fn(a) -> Bool,
+) -> Bool {
+  case predicate(list.first) {
+    True -> list.all(list.rest, predicate)
+    False -> False
+  }
+}
+
 /// Combines a `NonEmptyList` of `Result`s into a single `Result`. If all
 ///  elements in the list are `Ok` then returns an `Ok` holding the list of
 /// values. If any element is `Error` then returns the first error.
@@ -107,6 +135,36 @@ pub fn any(
   predicate(list.first) || list.any(list.rest, satisfying: predicate)
 }
 
+/// Determines whether or not a given element exists within a given list.
+///
+/// This function traverses the list to find the element, so it runs in linear
+/// time.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert NonEmptyList(0, []) |> contains(any: 0)
+/// ```
+///
+/// ```gleam
+/// assert !contains(NonEmptyList(1, []), any: 0)
+/// ```
+///
+/// ```gleam
+/// assert !contains(NonEmptyList(1, [1]), any: 0)
+/// ```
+///
+/// ```gleam
+/// assert NonEmptyList(1, [0]) |> contains(any: 0)
+/// ```
+///
+pub fn contains(list: NonEmptyList(a), any elem: a) -> Bool {
+  case list.first == elem {
+    False -> list.contains(list.rest, elem)
+    True -> True
+  }
+}
+
 /// Counts the number of elements in a given list satisfying a given predicate.
 ///
 /// This function has to traverse the list to determine the number of elements,
@@ -180,6 +238,58 @@ pub fn flat_map(
   list
   |> map(fun)
   |> flatten
+}
+
+/// Returns a new list containing only the elements from the first list for
+/// which the given functions returns `True`.
+///
+/// ## Examples
+///
+/// ```gleam
+/// filter(NonEmptyList(2, [4, 6, 1]), fn(x) { x > 2 })
+/// // -> [4, 6]
+/// ```
+///
+/// ```gleam
+/// filter(NonEmptyList(2, [4, 6, 1]), fn(x) { x > 6 })
+/// // -> []
+/// ```
+///
+pub fn filter(
+  list: NonEmptyList(a),
+  keeping predicate: fn(a) -> Bool,
+) -> List(a) {
+  let filtered = list.filter(list.rest, predicate)
+  case predicate(list.first) {
+    False -> filtered
+    True -> [list.first, ..filtered]
+  }
+}
+
+/// Returns a new list containing only the elements from the first list for
+/// which the given functions returns `Ok(_)`.
+///
+/// ## Examples
+///
+/// ```gleam
+/// filter_map(NonEmptyList(2, [4, 6, 1]), Error)
+/// // -> []
+/// ```
+///
+/// ```gleam
+/// filter_map(NonEmptyList(2, [4, 6, 1]), fn(x) { Ok(x + 1) })
+/// // -> [3, 5, 7, 2]
+/// ```
+///
+pub fn filter_map(
+  list: NonEmptyList(a),
+  with fun: fn(a) -> Result(b, Nil),
+) -> List(b) {
+  let filtered = list.filter_map(list.rest, fun)
+  case fun(list.first) {
+    Error(_) -> filtered
+    Ok(mapped) -> [mapped, ..filtered]
+  }
 }
 
 /// Finds the first element in a given non-empty list for which the given
@@ -273,6 +383,47 @@ pub fn fold(
   list.fold(over: list.rest, from: fun(initial, list.first), with: fun)
 }
 
+/// A variant of fold that allows to stop folding earlier.
+///
+/// The folding function should return `ContinueOrStop(accumulator)`.
+/// If the returned value is `Continue(accumulator)` fold_until will try the next value in the list.
+/// If the returned value is `Stop(accumulator)` fold_until will stop and return that accumulator.
+///
+/// ## Examples
+///
+/// ```gleam
+/// assert NonEmptyList(1, [2, 3, 4])
+///   |> fold_until(0, fn(acc, i) {
+///     case i < 3 {
+///       True -> Continue(acc + i)
+///       False -> Stop(acc)
+///     }
+///   })
+///   == 3
+/// ```
+///
+pub fn fold_until(
+  over list: NonEmptyList(a),
+  from acc: acc,
+  with fun: fn(acc, a) -> ContinueOrStop(acc),
+) {
+  case fun(acc, list.first) {
+    Continue(acc) ->
+      list.fold_until(list.rest, acc, fn(acc, x) {
+        case fun(acc, x) {
+          Continue(a) -> list.Continue(a)
+          Stop(a) -> list.Stop(a)
+        }
+      })
+    Stop(acc) -> acc
+  }
+}
+
+pub type ContinueOrStop(a) {
+  Continue(a)
+  Stop(a)
+}
+
 /// Attempts to turn a list into a non-empty list, fails if the starting
 /// list is empty.
 ///
@@ -321,6 +472,47 @@ pub fn group(
     let assert Ok(group) = from_list(group)
     group
   })
+}
+
+/// Like fold but the folding function also receives the index of the current element.
+///
+/// ## Examples
+///
+/// ```gleam
+/// NonEmptyList("a", ["b", "c"])
+/// |> index_fold("", fn(acc, item, index) {
+///    acc <> int.to_string(index) <> ":" <> item <> " "
+/// })
+/// // -> "0:a 1:b 2:c"
+/// ```
+///
+/// ```gleam
+/// NonEmptyList(10, [20, 30])
+/// |> index_fold(0, fn(acc, item, index) { acc + item * index })
+/// // -> 80
+/// ```
+///
+pub fn index_fold(
+  over list: NonEmptyList(a),
+  from initial: acc,
+  with fun: fn(acc, a, Int) -> acc,
+) -> acc {
+  initial
+  |> fun(list.first, 0)
+  |> index_fold_loop(list.rest, _, fun, 1)
+}
+
+fn index_fold_loop(
+  over: List(a),
+  acc: acc,
+  with: fn(acc, a, Int) -> acc,
+  index: Int,
+) -> acc {
+  case over {
+    [] -> acc
+    [first, ..rest] ->
+      index_fold_loop(rest, with(acc, first, index), with, index + 1)
+  }
 }
 
 /// Returns a new list containing only the elements of the first list after the
@@ -642,6 +834,39 @@ pub fn sort(
   sorted
 }
 
+/// Splits a list in two before the given index.
+///
+/// If the list is not long enough to have the given index the before list will
+/// be the input list, and the after list will be empty.
+///
+/// ## Examples
+///
+/// ```gleam
+/// split(NonEmptyList(6, [7, 8, 9]), 0)
+/// // -> #([], [6, 7, 8, 9])
+/// ```
+///
+/// ```gleam
+/// split(NonEmptyList(6, [ 7, 8, 9]), 2)
+/// // -> #([6, 7], [8, 9])
+/// ```
+///
+/// ```gleam
+/// split(NonEmptyList(6, [7, 8, 9]), 4)
+/// // -> #([6, 7, 8, 9], [])
+/// ```
+///
+pub fn split(list list: NonEmptyList(a), at index: Int) -> #(List(a), List(a)) {
+  case index {
+    0 -> #([], to_list(list))
+    1 -> #([list.first], list.rest)
+    _ -> {
+      let split = list.split(list.rest, index - 1)
+      #([list.first, ..split.0], split.1)
+    }
+  }
+}
+
 /// Takes two non-empty lists and returns a single non-empty list of 2-element
 /// tuples.
 ///
@@ -700,6 +925,72 @@ pub fn take(from list: NonEmptyList(a), up_to n: Int) -> List(a) {
 ///
 pub fn to_list(non_empty: NonEmptyList(a)) -> List(a) {
   [non_empty.first, ..non_empty.rest]
+}
+
+/// A variant of fold that might fail.
+///
+/// The folding function should return `Result(accumulator, error)`.
+/// If the returned value is `Ok(accumulator)` try_fold will try the next value in the list.
+/// If the returned value is `Error(error)` try_fold will stop and return that error.
+///
+/// ## Examples
+///
+/// ```gleam
+/// NonEmptyList(1, [2, 3, 4])
+/// |> try_fold(0, fn(acc, i) {
+///   case i < 3 {
+///     True -> Ok(acc + i)
+///     False -> Error(Nil)
+///   }
+/// })
+/// // -> Error(Nil)
+/// ```
+///
+pub fn try_fold(
+  over list: NonEmptyList(a),
+  from initial: b,
+  with fun: fn(b, a) -> Result(b, err),
+) -> Result(b, err) {
+  case fun(initial, list.first) {
+    Error(reason) -> Error(reason)
+    Ok(acc) -> list.try_fold(list.rest, acc, fun)
+  }
+}
+
+/// Takes a function that returns a `Result` and applies it to each element in a
+/// given list in turn.
+///
+/// If the function returns `Ok(new_value)` for all elements in the list then a
+/// list of the new values is returned.
+///
+/// If the function returns `Error(reason)` for any of the elements then it is
+/// returned immediately. None of the elements in the list are processed after
+/// one returns an `Error`.
+///
+/// ## Examples
+///
+/// ```gleam
+/// try_map(new(1, [2, 3]), fn(x) { Ok(x + 2) })
+/// // -> Ok([3, 4, 5])
+/// ```
+///
+/// ```gleam
+/// try_map(new(1, [2, 3]), fn(_) { Error(0) })
+/// // -> Error(0)
+/// ```
+///
+pub fn try_map(
+  over list: NonEmptyList(a),
+  with fun: fn(a) -> Result(b, c),
+) -> Result(NonEmptyList(b), c) {
+  case fun(list.first) {
+    Error(reason) -> Error(reason)
+    Ok(new_first) ->
+      case list.try_map(list.rest, fun) {
+        Error(reason) -> Error(reason)
+        Ok(new_rest) -> Ok(NonEmptyList(new_first, new_rest))
+      }
+  }
 }
 
 /// Removes any duplicate elements from a given list.
